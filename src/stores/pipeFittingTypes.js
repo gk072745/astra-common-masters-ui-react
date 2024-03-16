@@ -1,4 +1,5 @@
 import { addPipeFittingTypes, deleteMultiPipeFittingTypes, deletePipeFittingTypes, getPipeFittingTypes, updatePipeFittingTypes } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 // action types.........
 const GET_PIPE_FITTING_TYPE_SUCCESS = "GET_PIPE_FITTING_TYPE_SUCCESS";
@@ -28,8 +29,10 @@ const reducer = (state = initialState, { type, payload }) => {
 // actions.............
 
 const getPipeFittingTypesData = (data) => async (dispatch) => {
+    console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getPipeFittingTypes(data)
@@ -39,12 +42,15 @@ const getPipeFittingTypesData = (data) => async (dispatch) => {
                 type: GET_PIPE_FITTING_TYPE_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Pipe Fitting Types",
+        }))
         return err
     }
 
@@ -52,70 +58,99 @@ const getPipeFittingTypesData = (data) => async (dispatch) => {
 
 const addPipeFittingTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addPipeFittingTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Pipe Fitting Type Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Pipe Fitting Type",
+        }))
         return err
     }
 }
 
 const updatePipeFittingTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updatePipeFittingTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Pipe Fitting Type Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Pipe Fitting Type",
+        }))
         return err
     }
 }
 
 const deleteMultiPipeFittingTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteMultiPipeFittingTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Pipe Fitting Types Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Pipe Fitting Types",
+        }))
         return err
     }
 }
 
 const deletePipeFittingTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deletePipeFittingTypes(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Pipe Fitting Type Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Pipe Fitting Type",
+        }))
         return err
     }
 }

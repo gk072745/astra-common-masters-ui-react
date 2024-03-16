@@ -3,8 +3,8 @@ import CustomTable from "../../components/CustomTable"
 import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { addMasterPipesData, deleteMasterPipesData, deleteMultiMasterPipesData, getMasterPipesData, updateMasterPipesData } from "../../stores/masterPipes"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 const formDataInitial = {
     imperialDisplayText: '',
@@ -126,13 +126,11 @@ const MasterPipes = () => {
         }
 
         const res = await dispatch(getMasterPipesData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
-
-        console.log(masterPipes)
-
 
     }
 
@@ -161,19 +159,25 @@ const MasterPipes = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "MasterPipes", file: data }));
+        const res = await dispatch(importData({ modalName: "MasterPipes", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'MasterPipes', ...data }))
     }
 
     const openForm = (data = formDataInitial) => {
         setFormData(data)
         setShowForm(true)
-
     }
 
-    const closeForm = (() => {
+    const closeForm = () => {
         setFormData(formDataInitial)
         setShowForm(false)
-    })
+    }
+
+
     return <>
         <div className="table-header">
             Master Pipe List
@@ -203,6 +207,7 @@ const MasterPipes = () => {
                 deleteRowClicked={deleteProductType}
                 tableName='MasterPipes'
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

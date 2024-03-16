@@ -1,13 +1,11 @@
 import { useDispatch, useSelector } from "react-redux"
 import CustomTable from "../../components/CustomTable"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
-import { addGenericPipeSystemsData, deleteGenericPipeSystemsData, deleteMultiGenericPipeSystemsData, getGenericPipeSystemsData, updateGenericPipeSystemsData } from "../../stores/genericPipeSystems"
-import { getMasterPipesData } from "../../stores/masterPipes"
 import { clone } from "lodash"
 import { addPipeNetworkTypesData, deleteMultiPipeNetworkTypesData, deletePipeNetworkTypesData, getPipeNetworkTypesData, updatePipeNetworkTypesData } from "../../stores/pipeNetworkTypes"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -79,6 +77,7 @@ const PipeNetworkType = () => {
         }
 
         const res = await dispatch(getPipeNetworkTypesData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
@@ -110,7 +109,12 @@ const PipeNetworkType = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "PipeNetworkTypes", file: data }));
+        const res = await dispatch(importData({ modalName: "PipeNetworkTypes", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'PipeNetworkTypes', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -121,8 +125,8 @@ const PipeNetworkType = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
 
@@ -151,6 +155,7 @@ const PipeNetworkType = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

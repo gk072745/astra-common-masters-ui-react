@@ -1,6 +1,5 @@
 import { downloadFile, getImportLogs } from "../network/project.service";
-import { LOADING_END, LOADING_START } from "./uiFeedback";
-
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 // action types.........
 export const GET_IMPORT_LOGS_SUCCESS = "GET_IMPORT_LOGS_SUCCESS";
 
@@ -30,7 +29,7 @@ const reducer = (state = initialState, { type, payload }) => {
 const getImportLogsData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: LOADING_START })
+    dispatch(loadingStart())
     try {
 
         const r = await getImportLogs(data)
@@ -40,12 +39,16 @@ const getImportLogsData = (data) => async (dispatch) => {
                 type: GET_IMPORT_LOGS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: LOADING_END })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching ImportLogs', type: 'Feedback' })
+        console.log(err)
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Import Logs",
+        }))
         return err
     }
 
@@ -61,11 +64,11 @@ const exportImportLogFile = (type, data) => async (dispatch) => {
 
     console.log(url)
 
-    dispatch({ type: LOADING_START })
+    dispatch(loadingStart())
+
 
     try {
         const response = await downloadFile(url)
-
 
         const blob = new Blob([response.data])
         const link = document.createElement('a')
@@ -76,9 +79,15 @@ const exportImportLogFile = (type, data) => async (dispatch) => {
         link.download = `${data._id}_${data.modelName}_${formattedDate}${type == 'import' ? "_imported" : "_error"}.csv`
 
         link.click()
+        dispatch(loadingEnd())
 
     } catch (error) {
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: `Error Downloading ${type} Logs File`,
+        }))
         console.error('Error downloading file:', error)
+        return error
     }
 }
 

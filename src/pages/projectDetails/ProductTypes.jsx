@@ -4,7 +4,7 @@ import { addProductTypeData, deleteMultiProductData, deleteProductTypeData, getP
 import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 const initialFormData = {
     mainCategory: "",
@@ -81,13 +81,11 @@ const ProductTypes = () => {
         }
 
         const res = await dispatch(getProductTypesData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
-
-        console.log(productTypes)
-
 
     }
 
@@ -102,7 +100,7 @@ const ProductTypes = () => {
     }
 
     const handleSubmitClicked = async (data) => {
-        if (Object.keys(data).length < 3) return
+
         if (!data._id) {
             await dispatch(addProductTypeData(data))
         } else {
@@ -116,8 +114,12 @@ const ProductTypes = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "ProductTypes", file: data }));
+        const res = await dispatch(importData({ modalName: "ProductTypes", file: data }));
+        console.log(res)
+    }
 
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'ProductTypes', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -125,10 +127,10 @@ const ProductTypes = () => {
         setShowForm(true)
     }
 
-    const closeForm = (() => {
+    const closeForm = () => {
         setFormData(initialFormData)
         setShowForm(false)
-    })
+    }
 
 
     return <>
@@ -160,6 +162,7 @@ const ProductTypes = () => {
                 deleteRowClicked={deleteProductType}
                 tableName='ProductTypes'
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

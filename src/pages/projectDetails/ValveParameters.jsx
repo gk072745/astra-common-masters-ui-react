@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addValveParametersData, deleteMultiValveParametersData, deleteValveParametersData, getValveParametersData, updateValveParametersData } from "../../stores/valveParameters"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -133,6 +133,8 @@ const ValveParameters = () => {
         }
 
         const res = await dispatch(getValveParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -163,7 +165,12 @@ const ValveParameters = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "ValveParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "ValveParameters", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'ValveParameters', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -174,11 +181,10 @@ const ValveParameters = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
-    console.log(items)
 
     return <>
         <div className="table-header">
@@ -204,6 +210,7 @@ const ValveParameters = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

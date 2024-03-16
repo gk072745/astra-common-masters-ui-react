@@ -1,4 +1,5 @@
 import { addConnectionTypes, deleteConnectionTypes, deleteMultiConnectionTypes, getConnectionTypes, updateConnectionTypes } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -30,7 +31,8 @@ const reducer = (state = initialState, { type, payload }) => {
 const getConnectionTypesData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getConnectionTypes(data)
@@ -40,12 +42,15 @@ const getConnectionTypesData = (data) => async (dispatch) => {
                 type: GET_CONNECTION_TYPE_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Connection Types",
+        }))
         return err
     }
 
@@ -53,72 +58,98 @@ const getConnectionTypesData = (data) => async (dispatch) => {
 
 const addConnectionTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addConnectionTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Connection Type Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Connection Type",
+        }))
         return err
     }
 }
 
 const updateConnectionTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateConnectionTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Connection Type Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Connection Type",
+        }))
         return err
     }
 }
 
 const deleteMultiConnectionTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteMultiConnectionTypes(data)
 
         if (r.status === 200) {
-
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Connection Types Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Connection Types",
+        }))
         return err
     }
 }
 
 const deleteConnectionTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteConnectionTypes(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Connection Type Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Connection Type",
+        }))
         return err
     }
 }

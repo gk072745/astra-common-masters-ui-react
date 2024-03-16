@@ -1,4 +1,5 @@
 import { addPlumbingFixtureParameters, deleteMultiPlumbingFixtureParameters, deletePlumbingFixtureParameters, getPlumbingFixtureParameters, updatePlumbingFixtureParameters } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -29,8 +30,10 @@ const reducer = (state = initialState, { type, payload }) => {
 // actions.............
 
 const getPlumbingFixtureParametersData = (data) => async (dispatch) => {
+    console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getPlumbingFixtureParameters(data)
@@ -40,12 +43,15 @@ const getPlumbingFixtureParametersData = (data) => async (dispatch) => {
                 type: GET_PLUMBING_FIXTURE_PARAMETERS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Plumbing Fixture Parameters",
+        }))
         return err
     }
 
@@ -53,70 +59,99 @@ const getPlumbingFixtureParametersData = (data) => async (dispatch) => {
 
 const addPlumbingFixtureParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addPlumbingFixtureParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Plumbing Fixture Parameter Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Plumbing Fixture Parameter",
+        }))
         return err
     }
 }
 
 const updatePlumbingFixtureParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updatePlumbingFixtureParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Plumbing Fixture Parameter Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Plumbing Fixture Parameter",
+        }))
         return err
     }
 }
 
 const deleteMultiPlumbingFixtureParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteMultiPlumbingFixtureParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Plumbing Fixture Parameters Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Plumbing Fixture Parameters",
+        }))
         return err
     }
 }
 
 const deletePlumbingFixtureParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deletePlumbingFixtureParameters(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Plumbing Fixture Parameter Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Plumbing Fixture Parameter",
+        }))
         return err
     }
 }

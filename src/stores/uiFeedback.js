@@ -1,13 +1,15 @@
 // action types.........
 export const LOADING_START = "LOADING_START";
 export const LOADING_END = "LOADING_END";
-export const FEEDBACK = "FEEDBACK";
+export const FEEDBACK_START = "FEEDBACK_START";
+export const FEEDBACK_END = "FEEDBACK_END";
 
 // initial state......
 const initialState = {
     showOverlayLoader: false,
     snackbarState: false,
     snackbarText: "",
+    snackbarType: "",
 };
 
 // reducer.......
@@ -17,21 +19,25 @@ const reducer = (state = initialState, { type, payload }) => {
 
         case LOADING_START:
             return {
+                ...state,
                 showOverlayLoader: true,
-                snackbarState: false,
-                snackbarText: "",
+                // snackbarState: false,
+                // snackbarText: "",
             };
         case LOADING_END:
             return {
+                ...state,
                 showOverlayLoader: false,
-                snackbarState: false,
-                snackbarText: "",
             };
-        case FEEDBACK:
+        case FEEDBACK_START:
             return {
                 showOverlayLoader: false,
                 snackbarState: true,
-                snackbarText: payload,
+                ...payload
+            };
+        case FEEDBACK_END:
+            return {
+                ...initialState
             };
 
         default:
@@ -42,6 +48,23 @@ const reducer = (state = initialState, { type, payload }) => {
 
 // actions.............
 
+const loadingStart = () => (dispatch) => {
+    dispatch({ type: LOADING_START })
+}
 
+const loadingEnd = () => (dispatch) => {
+    dispatch({ type: LOADING_END })
+}
 
-export { reducer }
+const feedbackStart = (payload) => (dispatch) => {
+    dispatch({ type: FEEDBACK_START, payload })
+    setTimeout(() => {
+        dispatch({ type: FEEDBACK_END })
+    }, 3000)
+}
+
+const feedbackEnd = () => (dispatch) => {
+    dispatch({ type: FEEDBACK_END })
+}
+
+export { reducer, loadingStart, loadingEnd, feedbackStart, feedbackEnd }

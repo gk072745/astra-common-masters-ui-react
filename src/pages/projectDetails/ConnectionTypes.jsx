@@ -3,8 +3,8 @@ import CustomTable from "../../components/CustomTable"
 import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { addConnectionTypesData, deleteConnectionTypesData, deleteMultiConnectionTypesData, getConnectionTypesData, updateConnectionTypesData } from "../../stores/connectionTypes"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 const initialFormData = {
     name: "",
@@ -76,13 +76,11 @@ const MaterialTypes = () => {
         }
 
         const res = await dispatch(getConnectionTypesData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
-
-        console.log(items)
-
 
     }
 
@@ -111,7 +109,12 @@ const MaterialTypes = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "ConnectionTypes", file: data }));
+        const res = await dispatch(importData({ modalName: "ConnectionTypes", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'ConnectionTypes', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -148,6 +151,7 @@ const MaterialTypes = () => {
                 deleteRowClicked={handleDeleteRow}
                 tableName='MaterialTypes'
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

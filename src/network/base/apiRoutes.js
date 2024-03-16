@@ -4,6 +4,7 @@ export const routes = {
   productTypes: `ProductTypes/${apiVersion}/`,
   sampleImportFile: `SampleImportFile/${apiVersion}/`,
   commonImports: `/${apiVersion}/import`,
+  commonExports: `Common/${apiVersion}/export`,
 
   country: `Countries/${apiVersion}/`,
   MasterPipes: `MasterPipes/${apiVersion}/`,

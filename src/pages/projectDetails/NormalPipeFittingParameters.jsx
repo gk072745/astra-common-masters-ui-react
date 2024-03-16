@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addNormalPipeFittingParametersData, deleteMultiNormalPipeFittingParametersData, deleteNormalPipeFittingParametersData, getNormalPipeFittingParametersData, updateNormalPipeFittingParametersData } from "../../stores/normalPipeFittingParameters"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -133,6 +133,8 @@ const NormalPipeFittingParameters = () => {
         }
 
         const res = await dispatch(getNormalPipeFittingParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -163,7 +165,12 @@ const NormalPipeFittingParameters = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "NormalPipeFittingParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "NormalPipeFittingParameters", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'NormalPipeFittingParameters', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -174,8 +181,8 @@ const NormalPipeFittingParameters = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
     console.log(items)
@@ -204,6 +211,7 @@ const NormalPipeFittingParameters = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

@@ -3,8 +3,8 @@ import CustomTable from "../../components/CustomTable"
 import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { addMaterialTypesData, deleteMaterialTypesData, deleteMultiMaterialTypesData, getMaterialTypesData, updateMaterialTypesData } from "../../stores/materialTypes"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 const formDataInitial = {
     name: "",
@@ -76,13 +76,11 @@ const MaterialTypes = () => {
         }
 
         const res = await dispatch(getMaterialTypesData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
-
-        console.log(materialTypes)
-
 
     }
 
@@ -97,7 +95,7 @@ const MaterialTypes = () => {
     }
 
     const handleSubmitClicked = async (data) => {
-        if (Object.keys(data).length < 2) return
+
         if (!data._id) {
             await dispatch(addMaterialTypesData(data))
         } else {
@@ -111,7 +109,12 @@ const MaterialTypes = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "MaterialTypes", file: data }));
+        const res = await dispatch(importData({ modalName: "MaterialTypes", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'MaterialTypes', ...data }))
     }
 
     const openForm = (data = formDataInitial) => {
@@ -153,6 +156,7 @@ const MaterialTypes = () => {
                 deleteRowClicked={deleteProductType}
                 tableName='MaterialTypes'
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

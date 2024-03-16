@@ -1,5 +1,5 @@
 import { addValveParameters, deleteMultiValveParameters, deleteValveParameters, getValveParameters, updateValveParameters } from "../network/project.service";
-
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -30,8 +30,10 @@ const reducer = (state = initialState, { type, payload }) => {
 // actions.............
 
 const getValveParametersData = (data) => async (dispatch) => {
+    console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getValveParameters(data)
@@ -41,12 +43,15 @@ const getValveParametersData = (data) => async (dispatch) => {
                 type: GET_VALVE_PARAMETERS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Valve Parameterss",
+        }))
         return err
     }
 
@@ -54,70 +59,99 @@ const getValveParametersData = (data) => async (dispatch) => {
 
 const addValveParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addValveParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Valve Parameters Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Valve Parameters",
+        }))
         return err
     }
 }
 
 const updateValveParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateValveParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Valve Parameters Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Valve Parameters",
+        }))
         return err
     }
 }
 
 const deleteMultiValveParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteMultiValveParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Valve Parameterss Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Valve Parameterss",
+        }))
         return err
     }
 }
 
 const deleteValveParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteValveParameters(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Valve Parameters Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Valve Parameters",
+        }))
         return err
     }
 }

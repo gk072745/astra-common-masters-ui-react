@@ -1,4 +1,5 @@
 import { addCommonProductFields, deleteCommonProductFields, deleteMultiCommonProductFields, getCommonProductFields, updateCommonProductFields, } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -31,7 +32,8 @@ const reducer = (state = initialState, { type, payload }) => {
 const getCommonProductFieldsData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getCommonProductFields(data)
@@ -41,12 +43,15 @@ const getCommonProductFieldsData = (data) => async (dispatch) => {
                 type: GET_COMMON_PRODUCT_FIELDS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Common Product Fields",
+        }))
         return err
     }
 
@@ -54,70 +59,98 @@ const getCommonProductFieldsData = (data) => async (dispatch) => {
 
 const addCommonProductFieldsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addCommonProductFields(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Common Product Fields Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Common Product Fields",
+        }))
         return err
     }
 }
 
 const updateCommonProductFieldsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateCommonProductFields(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Common Product Fields Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Common Product Fields",
+        }))
         return err
     }
 }
 
 const deleteMultiCommonProductFieldsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteMultiCommonProductFields(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Common Product Fields Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Common Product Fields",
+        }))
         return err
     }
 }
 
 const deleteCommonProductFieldsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteCommonProductFields(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Common Product Fields  Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Common Product Fields ",
+        }))
         return err
     }
 }

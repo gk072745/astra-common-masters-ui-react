@@ -1,4 +1,5 @@
 import { addPipeNetworkTypes, deleteMultiPipeNetworkTypes, deletePipeNetworkTypes, getPipeNetworkTypes, updatePipeNetworkTypes } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -31,7 +32,8 @@ const reducer = (state = initialState, { type, payload }) => {
 const getPipeNetworkTypesData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getPipeNetworkTypes(data)
@@ -41,12 +43,15 @@ const getPipeNetworkTypesData = (data) => async (dispatch) => {
                 type: GET_PIPE_NETWORK_TYPES_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
-
+            dispatch(loadingEnd())
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Pipe Network Types",
+        }))
         return err
     }
 
@@ -54,72 +59,97 @@ const getPipeNetworkTypesData = (data) => async (dispatch) => {
 
 const addPipeNetworkTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await addPipeNetworkTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Pipe Network Type Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Pipe Network Type",
+        }))
         return err
     }
 }
 
 const updatePipeNetworkTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updatePipeNetworkTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Pipe Network Type Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Pipe Network Type",
+        }))
         return err
     }
 }
 
 const deleteMultiPipeNetworkTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteMultiPipeNetworkTypes(data)
 
         if (r.status === 200) {
-
-            dispatch({ type: 'LOADING_END' })
-
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Pipe Network Types Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Pipe Network Types",
+        }))
         return err
     }
 }
 
 const deletePipeNetworkTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deletePipeNetworkTypes(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Pipe Network Type Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Pipe Network Type",
+        }))
         return err
     }
 }

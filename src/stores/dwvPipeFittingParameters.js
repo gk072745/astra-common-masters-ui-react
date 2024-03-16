@@ -1,4 +1,5 @@
 import { addDWVPipeFittingParameters, deleteDWVPipeFittingParameters, deleteMultiDWVPipeFittingParameters, getDWVPipeFittingParameters, updateDWVPipeFittingParameters } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 // action types.........
 const GET_DWV_PIPE_FITTING_PARAMETERS_SUCCESS = "GET_DWV_PIPE_FITTING_PARAMETERS_SUCCESS";
@@ -29,7 +30,10 @@ const reducer = (state = initialState, { type, payload }) => {
 
 const getDWVPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    console.log(data)
+
+    dispatch(loadingStart())
+
     try {
 
         const r = await getDWVPipeFittingParameters(data)
@@ -39,12 +43,15 @@ const getDWVPipeFittingParametersData = (data) => async (dispatch) => {
                 type: GET_DWV_PIPE_FITTING_PARAMETERS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching DWV Pipe Fitting Parameters",
+        }))
         return err
     }
 
@@ -52,70 +59,99 @@ const getDWVPipeFittingParametersData = (data) => async (dispatch) => {
 
 const addDWVPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addDWVPipeFittingParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added DWV Pipe Fitting Parameter Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding DWV Pipe Fitting Parameter",
+        }))
         return err
     }
 }
 
 const updateDWVPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateDWVPipeFittingParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated DWV Pipe Fitting Parameter Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating DWV Pipe Fitting Parameter",
+        }))
         return err
     }
 }
 
 const deleteMultiDWVPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteMultiDWVPipeFittingParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted DWV Pipe Fitting Parameters Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting DWV Pipe Fitting Parameters",
+        }))
         return err
     }
 }
 
 const deleteDWVPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteDWVPipeFittingParameters(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted DWV Pipe Fitting Parameter Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting DWV Pipe Fitting Parameter",
+        }))
         return err
     }
 }

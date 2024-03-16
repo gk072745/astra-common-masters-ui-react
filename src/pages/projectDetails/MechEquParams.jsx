@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
-import { clone } from "lodash"
 import { addMechanicalEquipmentParametersData, deleteMechanicalEquipmentParametersData, deleteMultiMechanicalEquipmentParametersData, getMechanicalEquipmentParametersData, updateMechanicalEquipmentParametersData } from "../../stores/mechanicalEquipmentParameters"
+import { clone } from "lodash"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -133,6 +133,8 @@ const MechEquParams = () => {
         }
 
         const res = await dispatch(getMechanicalEquipmentParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -163,7 +165,12 @@ const MechEquParams = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "MechanicalEquipmentParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "MechanicalEquipmentParameters", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'MechanicalEquipmentParameters', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -174,11 +181,10 @@ const MechEquParams = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
-    console.log(items)
 
     return <>
         <div className="table-header">
@@ -204,6 +210,7 @@ const MechEquParams = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { addGenericPipeSystemsData, deleteGenericPipeSystemsData, deleteMultiGenericPipeSystemsData, getGenericPipeSystemsData, updateGenericPipeSystemsData } from "../../stores/genericPipeSystems"
 import { getMasterPipesData } from "../../stores/masterPipes"
+import { exportTables, importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 
 const initialFormData = {
@@ -158,6 +158,7 @@ const GenericPipeSystems = () => {
         }
 
         const res = await dispatch(getGenericPipeSystemsData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
@@ -189,7 +190,13 @@ const GenericPipeSystems = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "GenericPipeSystems", file: data }));
+        const res = await dispatch(importData({ modalName: "GenericPipeSystems", file: data }));
+        console.log(res)
+
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'GenericPipeSystems', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -243,6 +250,7 @@ const GenericPipeSystems = () => {
                 deleteRowClicked={handleDeleteRow}
                 tableName='GenericPipeSystems'
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

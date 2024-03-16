@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addPipeFittingTypesData, deleteMultiPipeFittingTypesData, deletePipeFittingTypesData, getPipeFittingTypesData, updatePipeFittingTypesData } from "../../stores/pipeFittingTypes"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -91,6 +91,8 @@ const PipeFittingTypes = () => {
         }
 
         const res = await dispatch(getPipeFittingTypesData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -121,7 +123,12 @@ const PipeFittingTypes = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "PipeFittingTypes", file: data }));
+        const res = await dispatch(importData({ modalName: "PipeFittingTypes", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'PipeFittingTypes', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -132,8 +139,8 @@ const PipeFittingTypes = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
     console.log(items)
@@ -162,6 +169,7 @@ const PipeFittingTypes = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

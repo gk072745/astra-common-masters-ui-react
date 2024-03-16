@@ -70,8 +70,9 @@ export const getSampleFile = (data) => {
   return getAPIResponse(urlWithQuery)
 }
 
-//     errors......
-export const addImports = ({ modalName, file }) => {
+// ........
+
+export const ImportFiles = ({ modalName, file }) => {
   const urlWithQuery = modalName + routes.commonImports
 
   const formData = new FormData()
@@ -79,9 +80,12 @@ export const addImports = ({ modalName, file }) => {
 
   return postAPIResponse(urlWithQuery, formData)
 }
-//     errors......
 
-
+export const exportFiles = (data) => {
+  const urlWithQuery = routes.commonExports + encodedURL(data)
+  return downloadAPIResponse(urlWithQuery)
+}
+// ........
 
 export const getCountry = async data => {
 

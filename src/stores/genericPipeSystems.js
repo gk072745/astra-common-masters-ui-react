@@ -1,4 +1,5 @@
 import { addGenericPipeSystems, deleteGenericPipeSystems, deleteMultiGenericPipeSystems, getGenericPipeSystems, updateGenericPipeSystems } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -48,7 +49,7 @@ const reducer = (state = initialState, { type, payload }) => {
 const getGenericPipeSystemsData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await getGenericPipeSystems(data)
@@ -58,12 +59,15 @@ const getGenericPipeSystemsData = (data) => async (dispatch) => {
                 type: GET_GENERIC_PIPE_SYSTEMS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Generic Pipe Systems",
+        }))
         return err
     }
 
@@ -71,72 +75,98 @@ const getGenericPipeSystemsData = (data) => async (dispatch) => {
 
 const addGenericPipeSystemsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addGenericPipeSystems(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Generic Pipe Systems Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Generic Pipe Systems",
+        }))
         return err
     }
 }
 
 const updateGenericPipeSystemsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateGenericPipeSystems(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Generic Pipe Systems Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Generic Pipe Systems",
+        }))
         return err
     }
 }
 
 const deleteMultiGenericPipeSystemsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteMultiGenericPipeSystems(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Generic Pipe Systems Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Generic Pipe Systems",
+        }))
         return err
     }
 }
 
 const deleteGenericPipeSystemsData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteGenericPipeSystems(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Generic Pipe System Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Generic Pipe System Successfully",
+        }))
         return err
     }
 }

@@ -1,4 +1,5 @@
 import { addCountry, deleteCountry, deleteMultiCountry, getCountry, updateCountry } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -30,7 +31,8 @@ const reducer = (state = initialState, { type, payload }) => {
 const getCountryData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getCountry(data)
@@ -40,12 +42,15 @@ const getCountryData = (data) => async (dispatch) => {
                 type: GET_COUNTRY_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Countries', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Countries",
+        }))
         return err
     }
 
@@ -53,72 +58,96 @@ const getCountryData = (data) => async (dispatch) => {
 
 const addCountryData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addCountry(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Project Type Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Project Type",
+        }))
         return err
     }
 }
 
 const updateCountryData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await updateCountry(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Country Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Country",
+        }))
         return err
     }
 }
 
 const deleteMultiCountryData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteMultiCountry(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Countries Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Countries",
+        }))
         return err
     }
 }
 
 const deleteCountryData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteCountry(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
-
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Country Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Country",
+        }))
         return err
     }
 }

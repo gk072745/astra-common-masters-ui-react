@@ -3,8 +3,8 @@ import CustomTable from "../../components/CustomTable"
 import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { addCountryData, deleteCountryData, deleteMultiCountryData, getCountryData, updateCountryData } from "../../stores/country"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 const initialFormData = {
     name: "",
@@ -91,13 +91,11 @@ const Country = () => {
         }
 
         const res = await dispatch(getCountryData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
-
-        console.log(countries)
-
 
     }
 
@@ -112,7 +110,7 @@ const Country = () => {
     }
 
     const handleSubmitClicked = async (data) => {
-        if (Object.keys(data).length < 3) return
+
         if (!data._id) {
             await dispatch(addCountryData(data))
         } else {
@@ -126,7 +124,12 @@ const Country = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "Country", file: data }));
+        const res = await dispatch(importData({ modalName: "Countries", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'Countries', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -135,10 +138,10 @@ const Country = () => {
 
     }
 
-    const closeForm = (() => {
+    const closeForm = () => {
         setFormData(initialFormData)
         setShowForm(false)
-    })
+    }
 
 
     return <>
@@ -170,6 +173,7 @@ const Country = () => {
                 deleteRowClicked={deleteProductType}
                 tableName='Countries'
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addDWVPipeFittingParametersData, deleteDWVPipeFittingParametersData, deleteMultiDWVPipeFittingParametersData, getDWVPipeFittingParametersData, updateDWVPipeFittingParametersData } from "../../stores/dwvPipeFittingParameters"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -133,6 +133,8 @@ const DWVPipeFittingParameters = () => {
         }
 
         const res = await dispatch(getDWVPipeFittingParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -163,7 +165,12 @@ const DWVPipeFittingParameters = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "DWVPipeFittingParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "DWVPipeFittingParameters", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'DWVPipeFittingParameters', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -174,8 +181,8 @@ const DWVPipeFittingParameters = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
     console.log(items)
@@ -204,6 +211,7 @@ const DWVPipeFittingParameters = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addPipeParametersData, deleteMultiPipeParametersData, deletePipeParametersData, getPipeParametersData, updatePipeParametersData } from "../../stores/pipeParameters"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -133,6 +133,8 @@ const PipeParameters = () => {
         }
 
         const res = await dispatch(getPipeParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -163,7 +165,12 @@ const PipeParameters = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "CommonProductFields", file: data }));
+        const res = await dispatch(importData({ modalName: "CommonProductFields", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'CommonProductFields', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -204,6 +211,7 @@ const PipeParameters = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

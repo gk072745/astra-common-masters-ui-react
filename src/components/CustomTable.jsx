@@ -5,7 +5,6 @@ import { TbTableDown, TbTableImport } from "react-icons/tb";
 import SampleFileBtn from "./SampleFileBtn";
 import { DataGrid } from "@mui/x-data-grid";
 import { HiOutlineDotsVertical } from 'react-icons/hi'
-import { TabletMac } from "@mui/icons-material";
 import { createPortal } from "react-dom";
 
 const initialQueries = {
@@ -27,7 +26,7 @@ const queryReducer = (state, { type, payload }) => {
     }
 };
 
-const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fetchData, addDataText, deleteAllCicked, deleteRowClicked, openForm, importBtnClicked }) => {
+const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fetchData, addDataText, deleteAllCicked, deleteRowClicked, openForm, importBtnClicked, handleExportOptionClicked }) => {
     const [queries, dispatchQueries] = useReducer(queryReducer, initialQueries);
     const [anchorEl, setAnchorEl] = useState(null);
     const [rowSelectionModel, setRowSelectionModel] = useState([]);
@@ -109,6 +108,16 @@ const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fe
         },
     };
 
+    const exportOptions = [
+        {
+            title: '.xlsx',
+            value: 'xlsx',
+        },
+        {
+            title: '.csv',
+            value: 'csv',
+        },
+    ]
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -140,9 +149,22 @@ const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fe
         if (!isSupportedFile(fileToImport.name)) {
             alert("invalid file type")
         } else {
-            // importBtnClicked(fileToImport)
-            console.log(fileToImport)
+            importBtnClicked(fileToImport)
         }
+    }
+
+    const exportOptionClicked = (format) => {
+        const { search, sortModel } = queries
+
+        handleExportOptionClicked({
+            format,
+            search: search || "",
+            sort: sortModel?.length ? sortModel[0].field : "",
+            sortOrder: sortModel?.length ? sortModel[0].sort : "",
+        })
+
+        handleClose()
+
     }
 
     useEffect(() => {
@@ -209,8 +231,13 @@ const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fe
                                     'aria-labelledby': 'basic-button',
                                 }}
                             >
-                                <MenuItem onClick={handleClose}> .xlsx </MenuItem>
-                                <MenuItem onClick={handleClose}> .csv </MenuItem>
+
+                                {
+                                    exportOptions.map(({ title, value }) => {
+                                        return <MenuItem key={value} onClick={() => exportOptionClicked(value)}>{title} </MenuItem>
+                                    })
+                                }
+
                             </Menu>
 
 

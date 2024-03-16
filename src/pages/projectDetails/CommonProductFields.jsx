@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addCommonProductFieldsData, deleteCommonProductFieldsData, deleteMultiCommonProductFieldsData, getCommonProductFieldsData, updateCommonProductFieldsData } from "../../stores/commonProductFields"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -132,6 +132,7 @@ const CommonProductFields = () => {
         }
 
         const res = await dispatch(getCommonProductFieldsData(options))
+        console.log(res)
 
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
@@ -163,7 +164,12 @@ const CommonProductFields = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "CommonProductFields", file: data }));
+        const res = await dispatch(importData({ modalName: "CommonProductFields", file: data }));
+        console.log(res)
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'CommonProductFields', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -202,6 +208,7 @@ const CommonProductFields = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

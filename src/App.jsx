@@ -1,10 +1,12 @@
-import { Backdrop, CircularProgress, Snackbar, SnackbarContent } from "@mui/material";
+import { Backdrop, CircularProgress, Snackbar, SnackbarContent, Alert } from "@mui/material";
 import DefaultLayout from "./layouts/DefaultLayout";
 import { useSelector } from "react-redux";
 // import MainRoutes from "./router/MainRoute";
 
 function App() {
-  const { showOverlayLoader, snackbarState, snackbarText } = useSelector((store) => store.uiFeedbackReducer)
+  const a = useSelector((store) => store.uiFeedbackReducer)
+  let { showOverlayLoader, snackbarState, snackbarText, snackbarType } = a
+  console.log(a)
   return (
     <>
       <DefaultLayout />
@@ -15,14 +17,11 @@ function App() {
       <Snackbar
         open={snackbarState}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={5000}
-        message={snackbarText}
-        sx={{ justifyContent: 'center' }}
       >
-
-
+        <Alert severity={snackbarType} sx={{ width: '100%' }}>
+          {snackbarText}
+        </Alert>
       </Snackbar>
-      {/* <MainRoutes /> */}
     </>
   );
 }

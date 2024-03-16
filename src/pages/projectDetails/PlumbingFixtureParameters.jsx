@@ -3,10 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
-import { addDWVPipeFittingParametersData, deleteDWVPipeFittingParametersData, deleteMultiDWVPipeFittingParametersData, getDWVPipeFittingParametersData, updateDWVPipeFittingParametersData } from "../../stores/dwvPipeFittingParameters"
 import { addPlumbingFixtureParametersData, deleteMultiPlumbingFixtureParametersData, deletePlumbingFixtureParametersData, getPlumbingFixtureParametersData, updatePlumbingFixtureParametersData } from "../../stores/plumbingFixtureParameters"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -134,6 +133,8 @@ const PlumbingFixtureParameters = () => {
         }
 
         const res = await dispatch(getPlumbingFixtureParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -164,9 +165,13 @@ const PlumbingFixtureParameters = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "PlumbingFixtureParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "PlumbingFixtureParameters", file: data }));
+        console.log(res)
     }
 
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'PlumbingFixtureParameters', ...data }))
+    }
     const openForm = (data = initialFormData) => {
         const formData = clone(data)
 
@@ -175,8 +180,8 @@ const PlumbingFixtureParameters = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
     console.log(items)
@@ -205,6 +210,7 @@ const PlumbingFixtureParameters = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

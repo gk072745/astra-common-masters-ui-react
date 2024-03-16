@@ -1,4 +1,5 @@
 import { addNormalPipeFittingParameters, deleteMultiNormalPipeFittingParameters, deleteNormalPipeFittingParameters, getNormalPipeFittingParameters, updateNormalPipeFittingParameters } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -30,7 +31,7 @@ const reducer = (state = initialState, { type, payload }) => {
 
 const getNormalPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await getNormalPipeFittingParameters(data)
@@ -40,12 +41,15 @@ const getNormalPipeFittingParametersData = (data) => async (dispatch) => {
                 type: GET_NORMAL_PIPE_FITTING_PARAMETERS_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
+            dispatch(loadingEnd())
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Normal Pipe Fitting Parameters",
+        }))
         return err
     }
 
@@ -53,70 +57,98 @@ const getNormalPipeFittingParametersData = (data) => async (dispatch) => {
 
 const addNormalPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addNormalPipeFittingParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Normal Pipe Fitting Parameter Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Connection Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Normal Pipe Fitting Parameter",
+        }))
         return err
     }
 }
 
 const updateNormalPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateNormalPipeFittingParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Normal Pipe Fitting Parameter Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Normal Pipe Fitting Parameter",
+        }))
         return err
     }
 }
 
 const deleteMultiNormalPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteMultiNormalPipeFittingParameters(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Normal Pipe Fitting Parameters Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Normal Pipe Fitting Parameters",
+        }))
         return err
     }
 }
 
 const deleteNormalPipeFittingParametersData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteNormalPipeFittingParameters(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Normal Pipe Fitting Parameter Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Country', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Normal Pipe Fitting Parameter",
+        }))
         return err
     }
 }

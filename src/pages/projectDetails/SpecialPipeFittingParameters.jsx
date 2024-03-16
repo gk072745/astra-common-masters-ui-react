@@ -3,9 +3,9 @@ import CustomTable from "../../components/CustomTable"
 import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
-import { importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
 import { addSpecialPipeFittingParametersData, deleteMultiSpecialPipeFittingParametersData, deleteSpecialPipeFittingParametersData, getSpecialPipeFittingParametersData, updateSpecialPipeFittingParametersData } from "../../stores/specialPipeFittingParameters"
+import { exportTables, importData } from "../../stores/importAndExport"
 
 
 const initialFormData = {
@@ -133,6 +133,8 @@ const SpecialPipeFittingParameters = () => {
         }
 
         const res = await dispatch(getSpecialPipeFittingParametersData(options))
+        console.log(res)
+
         if (res.status === 200) {
             setRowCount(res.data.meta.totalItems)
         }
@@ -163,7 +165,13 @@ const SpecialPipeFittingParameters = () => {
     }
 
     const handleImportBtnClicked = async (data) => {
-        await dispatch(importData({ modalName: "NormalPipeFittingParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "NormalPipeFittingParameters", file: data }));
+        console.log(res)
+
+    }
+
+    const handleExportOptionClicked = async (data) => {
+        await dispatch(exportTables({ type: 'NormalPipeFittingParameters', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
@@ -174,11 +182,10 @@ const SpecialPipeFittingParameters = () => {
     }
 
     const closeForm = (() => {
-        setShowForm(false)
         setFormData(initialFormData)
+        setShowForm(false)
     })
 
-    console.log(items)
 
     return <>
         <div className="table-header">
@@ -204,6 +211,7 @@ const SpecialPipeFittingParameters = () => {
                 deleteAllCicked={handleDeleteAllClicked}
                 deleteRowClicked={handleDeleteRow}
                 importBtnClicked={handleImportBtnClicked}
+                handleExportOptionClicked={handleExportOptionClicked}
             />
         </div>
 

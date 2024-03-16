@@ -1,5 +1,5 @@
-import { addImports } from "../network/project.service";
-import { LOADING_END, LOADING_START } from "./uiFeedback";
+import { ImportFiles, exportFiles } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 // action types.........
 
@@ -23,51 +23,81 @@ const reducer = (state = initialState, { type, payload }) => {
 const importData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: LOADING_START })
+    dispatch(loadingStart())
     try {
 
-        const r = await addImports(data)
+        const r = await ImportFiles(data)
 
         if (r.status === 200) {
-            dispatch({ type: LOADING_END })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Import started successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Importing File', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: `Error Importing File`,
+        }))
         return err
     }
 
 }
 
-// const exportImportLogFile = (type, data) => async (dispatch) => {
-//     let url
-//     if (type == 'import') {
-//         url = data.importedFileUrl
-//     } else {
-//         url = data.errorLogsUrl
-//     }
+const exportTables = (data) => async (dispatch) => {
+    console.log(data)
 
-//     console.log(url)
+    dispatch(loadingStart())
 
-//     dispatch({ type: LOADING_START })
+    try {
+        const result = await exportFiles(data)
 
-//     try {
-//         const response = await downloadFile(url)
+        const currentDT = new Date()
+
+        const formattedDateAndTime = `${(currentDT.getMonth() + 1).toString().padStart(2, '0')}/${currentDT.getDate().toString().padStart(2, '0')}/${currentDT.getFullYear()}_${currentDT.getHours().toString().padStart(2, '0')}:${currentDT.getMinutes().toString().padStart(2, '0')}_${currentDT.getHours() >= 12 ? 'PM' : 'AM'}`
+
+        if (result.status === 200) {
+            if (data.format == 'xlsx') {
+                const blob = new Blob([result.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+                const url = window.URL.createObjectURL(blob)
+                const a = document.createElement('a')
+
+                a.href = url
+                a.download = `${data.type}-${formattedDateAndTime}.xlsx`
+                document.body.appendChild(a)
+                a.click()
+                window.URL.revokeObjectURL(url)
+            }
+            else if (data.format == 'csv') {
+                const blob = new Blob([result.data], { type: 'text/csv' })
+                const url = window.URL.createObjectURL(blob)
+                const a = document.createElement('a')
+
+                a.href = url
+                a.download = `${data.type}-${formattedDateAndTime}.csv`
+                document.body.appendChild(a)
+                a.click()
+                window.URL.revokeObjectURL(url)
+            }
+            dispatch(loadingEnd())
+        } else {
+            dispatch(feedbackStart({
+                snackbarType: "error",
+                snackbarText: `Error While Exporting`,
+            }))
+        }
+
+    } catch (err) {
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: `Error While Exporting`,
+        }))
+        console.log(err)
+    }
+
+}
 
 
-//         const blob = new Blob([response.data])
-//         const link = document.createElement('a')
 
-//         const formattedDate = `${new Date(data.createdAt).getDate()}_${new Date(data.createdAt).getMonth() + 1}_${new Date(data.createdAt).getFullYear() % 100}`
-
-//         link.href = window.URL.createObjectURL(blob)
-//         link.download = `${data._id}_${data.modelName}_${formattedDate}${type == 'import' ? "_imported" : "_error"}.csv`
-
-//         link.click()
-
-//     } catch (error) {
-//         console.error('Error downloading file:', error)
-//     }
-// }
-
-export { reducer, importData }
+export { reducer, importData, exportTables }

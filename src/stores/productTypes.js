@@ -1,4 +1,5 @@
 import { getProductTypes, deleteMultiProductTypes, deleteProductType, addProductTypes, updateProductTypes } from "../network/project.service";
+import { feedbackStart, loadingEnd, loadingStart } from "./uiFeedback";
 
 
 // action types.........
@@ -30,7 +31,8 @@ const reducer = (state = initialState, { type, payload }) => {
 const getProductTypesData = (data) => async (dispatch) => {
     console.log(data)
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await getProductTypes(data)
@@ -40,12 +42,14 @@ const getProductTypesData = (data) => async (dispatch) => {
                 type: GET_PRODUCT_TYPES_SUCCESS,
                 payload: r.data.data
             })
-            dispatch({ type: 'LOADING_END' })
-
+            dispatch(loadingEnd())
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Fetching Project Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Fetching Project Types",
+        }))
         return err
     }
 
@@ -53,82 +57,102 @@ const getProductTypesData = (data) => async (dispatch) => {
 
 const addProductTypeData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await addProductTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Added Project Type Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Project Type', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Adding Project Type",
+        }))
         return err
     }
 }
 
 const updateProductTypesData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await updateProductTypes(data)
 
         if (r.status === 200) {
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "success",
+                snackbarText: "Updated Project Type Successfully",
+            }))
+
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Project Type', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Updating Project Type",
+        }))
         return err
     }
 }
 
 const deleteMultiProductData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
     try {
 
         const r = await deleteMultiProductTypes(data)
 
         if (r.status === 200) {
-
-            dispatch({ type: 'LOADING_END' })
-
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Project Types Successfully",
+            }))
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Adding Project Types', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Project Types",
+        }))
         return err
     }
 }
 
 const deleteProductTypeData = (data) => async (dispatch) => {
 
-    dispatch({ type: 'LOADING_START' })
+    dispatch(loadingStart())
+
     try {
 
         const r = await deleteProductType(data)
 
         if (r.status === 200) {
 
-            dispatch({ type: 'LOADING_END' })
+            dispatch(feedbackStart({
+                snackbarType: "warning",
+                snackbarText: "Deleted Project Type Successfully",
+            }))
 
         }
         return r
     } catch (err) {
-        dispatch({ payload: 'Error Deleting Project Type', type: 'Feedback' })
+        dispatch(feedbackStart({
+            snackbarType: "error",
+            snackbarText: "Error Deleting Project Type",
+        }))
         return err
     }
 }
-
-const importData = (data) => async (dispatch) => {
-
-}
-
-
-
 
 
 export { reducer, getProductTypesData, addProductTypeData, deleteMultiProductData, deleteProductTypeData, updateProductTypesData }
