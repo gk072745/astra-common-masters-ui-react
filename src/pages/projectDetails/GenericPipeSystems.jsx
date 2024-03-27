@@ -7,6 +7,7 @@ import { addGenericPipeSystemsData, deleteGenericPipeSystemsData, deleteMultiGen
 import { getMasterPipesData } from "../../stores/masterPipes"
 import { exportTables, importData } from "../../stores/importAndExport"
 import { clone } from "lodash"
+import * as yup from 'yup'
 
 const initialFormData = {
     name: "",
@@ -143,6 +144,12 @@ const GenericPipeSystems = () => {
                 },
             },
         ],
+        formValidations: {
+            name: yup.string().required('Name is required.'),
+            code: yup.string().required('MCode is required.'),
+            unitType: yup.string().required('Unit Type is required.'),
+            master_pipes: yup.array().required('Master Pipes is required.'),
+        }
     }
 
     const fetchData = async (data) => {

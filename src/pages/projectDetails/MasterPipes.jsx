@@ -5,6 +5,7 @@ import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
 import { addMasterPipesData, deleteMasterPipesData, deleteMultiMasterPipesData, getMasterPipesData, updateMasterPipesData } from "../../stores/masterPipes"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 const formDataInitial = {
     imperialDisplayText: '',
@@ -110,7 +111,20 @@ const MasterPipes = () => {
                 cols: 6,
             },
 
-        ]
+        ],
+        formValidations: {
+            imperialDisplayText: yup.string()
+                .required('Imperial Display Text is required.')
+                .matches(/^\d+$/, 'Imperial Display Text must be a number.'),
+            outerDiameterInches: yup.string().required('Outer Diameter Inches is required.')
+                .matches(/^\d+$/, 'Outer Diameter Inches must be a number.'),
+            metricDisplayText: yup.string().required('Metric Display Text is required.'),
+            outerDiameterMM: yup.string().required('Outer Diameter MM is required.')
+                .matches(/^\d+$/, 'Outer Diameter MM must be a number.'),
+            dNSize: yup.string().required('dN Size is required.')
+                .matches(/^\d+$/, 'dN Size must be a number.'),
+        }
+
     }
 
     const fetchData = async (data) => {

@@ -1,35 +1,40 @@
 import { cloneDeep } from "lodash";
 import { Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, Chip, Dialog, FormControl, FormControlLabel, Switch, TextField } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import PipeSizesDialog from "./PipeSizesDialog";
+import { useFormik } from "formik";
+import * as yup from 'yup'
+import { useDispatch } from "react-redux";
+
+
 
 const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitClicked }) => {
   const [formConfigLocal, setFormConfigLocal] = useState(cloneDeep(formConfig))
-  const [formDataLocal, setFormDataLocal] = useState(cloneDeep(formData))
   const [dependencies, setDependencies] = useState({})
   const [dialogs, setDialogs] = useState([]);
+  const [asyncList, setAsyncList] = useState({})
+  const [refsList, setRefsList] = useState({})
+  const [loaders, setLoaders] = useState({})
+  const dispatch = useDispatch()
+  const [lastChangedField, setLastChangedField] = useState({ key: '', val: '' })
 
-  // console.log(formConfig, formData, formConfigLocal, formDataLocal, initalformConfig)
+
+  const formik = useFormik({
+    initialValues: cloneDeep(formData),
+    validationSchema: yup.object(formConfigLocal.formValidations),
+    onSubmit: (values) => {
+      handleSubmitClicked(values)
+    },
+  });
+
+
   const handleCancel = (e) => {
     handleCancelClicked();
   };
 
-  const handleSubmit = (e) => {
-    // console.log(formDataLocal)
-    handleSubmitClicked(formDataLocal);
-  };
-
-  const handleFieldChange = (key, val) => {
-    // console.log(key, val)
-    setFormDataLocal(data => {
-      const updatedData = { ...data, [key]: val };
-      checkDependency(key, val, updatedData);
-      return updatedData;
-    })
-  }
-
-  const checkDependency = (key, e, formDataLocal) => {
+  const checkDependency = (key, e, formDataLocal = formik.values) => {
     // console.log(key, e, formDataLocal)
+    if (!key) return
 
     const dependencyKeys = dependencies[key];
 
@@ -91,7 +96,7 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
     })
   }
 
-  const getSelectedPipes = (data => {
+  const getSelectedPipes = data => {
     if (!data) return []
 
     console.log(data)
@@ -100,10 +105,92 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
     } else {
       return data.map(item => item._id)
     }
-  })
+  }
+
+  const handlePipeSizeDialogClose = (key) => {
+    setDialogs(prevState => {
+      const updatedDialogs = [...prevState];
+      updatedDialogs[key] = false;
+      return updatedDialogs;
+    })
+  }
+
+  const handlePipeSizeSubmit = (key, val) => {
+    formik.setFieldValue(key, val);
+    setLastChangedField(key, val)
+    handlePipeSizeDialogClose(key)
+  }
+
+  // intializing neccesary variables
+  const initalizeAsynclist = (key) => {
+    setAsyncList((prevVal) => {
+      return { ...prevVal, [`asyncList__${key}`]: [] };
+    })
+  }
+
+  const initalizeRefs = (key) => {
+    setRefsList((prevVal) => {
+      return { ...prevVal, [`refs__${key}`]: null };
+    })
+  }
+
+  const initalizeLoaders = (key) => {
+    setLoaders((prevVal) => {
+      return { ...prevVal, [`loader__${key}`]: false };
+    })
+  };
+
+  const handleApicalls = async (config, e) => {
+    if (refsList[`refs__${config.key}`]) {
+      clearTimeout(refsList[`refs__${config.key}`]);
+      setRefsList((prevVal) => {
+        return { ...prevVal, [`refs__${config.key}`]: null }
+      })
+    }
+
+    setRefsList((prevVal) => {
+      return {
+        ...prevVal, [`refs__${config.key}`]: setTimeout(async () => {
+
+          setLoaders((prevVal) => {
+            return { ...prevVal, [`loader__${config.key}`]: true }
+          })
+
+          const result = await dispatch(config.apiCall({
+            search: e ?? "",
+            ...config.params,
+          }));
+          if (result) {
+            setAsyncList((prevVal) => {
+              return {
+                ...prevVal,
+                [`asyncList__${config.key}`]: result.data.data
+              }
+            })
+
+            setLoaders((prevVal) => {
+              return {
+                ...prevVal,
+                [`loader__${config.key}`]: false
+              }
+            })
+          }
+        }, 300)
+      }
+    })
+
+  };
 
   useEffect(() => {
-    formConfigLocal.formFields.forEach(async (config) => {
+    formConfigLocal.formFields.forEach((config) => {
+
+      if (config.type == "asyncAutocomplete") {
+        initalizeAsynclist(config.key)
+        initalizeRefs(config.key)
+        initalizeLoaders(config.key)
+        handleApicalls(config, formik.values[config.key] && formik.values[config.key][config.itemText] ? formik.values[config.key][config.itemText] : '')
+      }
+
       if (config.dependentKey) {
         config.dependentKey.forEach((key) => {
           setDependencies(prevDependencies => {
@@ -133,80 +220,140 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
   useEffect(() => {
     // console.log(dependencies)
     for (const key in dependencies) {
-      checkDependency(key, formDataLocal[key], formDataLocal);
+      checkDependency(key, formik.values[key], formik.values);
     }
   }, [dependencies])
 
 
-  const handlePipeSizeDialogClose = (key) => {
-    setDialogs(prevState => {
-      const updatedDialogs = [...prevState];
-      updatedDialogs[key] = false;
-      return updatedDialogs;
-    })
-  }
-
-  const handlePipeSizeSubmit = (key, val) => {
-    handleFieldChange(key, val)
-    handlePipeSizeDialogClose(key)
-  }
+  useEffect(() => {
+    checkDependency(lastChangedField.key, lastChangedField.val)
+  }, [formik.values])
 
 
   return (
     <Card sx={{ padding: '1.5rem' }}>
-      <CardHeader title={formConfigLocal.formHeader} />
-      <CardContent>
-        <FormControl fullWidth>
+      <form onSubmit={formik.handleSubmit}>
+
+        <CardHeader title={formConfigLocal.formHeader} />
+        <CardContent>
           {formConfigLocal.formFields?.map((field, key) => (
             <Box key={key} sx={{ display: 'flex', marginBottom: '1rem' }}>
               {field.type === 'text' ? (
                 <TextField
-                  sx={{ flexGrow: 1 }}
+                  name={field.key}
                   label={field.label}
+                  sx={{ flexGrow: 1 }}
                   variant="standard"
-                  value={formDataLocal[field.key]}
-                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                  value={formik.values[field.key]}
+                  error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                  helperText={formik.touched[field.key] && formik.errors[field.key]}
+                  onChange={(e) => { formik.handleChange(e); setLastChangedField({ key: field.key, val: e.target.value }) }}
+                  onBlur={formik.handleBlur}
                 />
               ) : field.type === 'textarea' ? (
                 <TextField
-                  sx={{ flexGrow: 1 }}
+                  name={field.key}
                   label={field.label}
+                  sx={{ flexGrow: 1 }}
                   variant="standard"
-                  value={formDataLocal[field.key]}
                   multiline
                   rows={3}
-                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                  value={formik.values[field.key]}
+                  error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                  helperText={formik.touched[field.key] && formik.errors[field.key]}
+                  onChange={(e) => { formik.handleChange(e); setLastChangedField({ key: field.key, val: e.target.value }) }}
+                  onBlur={formik.handleBlur}
                 />
               ) : field.type === 'autocomplete' ? (
                 <Autocomplete
+                  name={field.key}
                   sx={{ flexGrow: 1 }}
                   size="small"
                   options={field.items}
-                  value={formDataLocal[field.key]}
-                  isOptionEqualToValue={(option, value) => !value || option === value || option[field.itemValue] === value || option[field.itemValue] === value[field.itemValue]}
+                  value={formik.values[field.key]}
                   getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
-                  renderInput={(params) => <TextField variant="standard"  {...params} label={field.label} />}
-                  onChange={(e, newVal) => handleFieldChange(field.key, typeof newVal === 'string' ? newVal : newVal[field.itemValue])}
+                  isOptionEqualToValue={(option, value) => !value || option === value || option[field.itemValue] === value || option[field.itemValue] === value[field.itemValue]}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      label={field.label}
+                      error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                      helperText={formik.touched[field.key] && formik.errors[field.key]}
+                    />)}
+                  onChange={(e, newVal, type) => {
+                    if (type === 'clear') {
+                      const val = typeof newVal === 'string' ? '' : null;
+                      formik.setFieldValue(field.key, val);
+                      setLastChangedField({ key: field.key, val })
+                    } else {
+                      const val = typeof newVal === 'string' ? newVal : newVal[field.itemValue];
+                      formik.setFieldValue(field.key, val);
+                      setLastChangedField({ key: field.key, val })
+                    }
+                  }}
                   defaultValue={field.defaultValue}
+                  onBlur={formik.handleBlur}
+                />
+              ) : field.type === 'asyncAutocomplete' ? (
+                <Autocomplete
+                  name={field.key}
+                  sx={{ flexGrow: 1 }}
+                  size="small"
+                  options={asyncList[`asyncList__${field.key}`] ?? []}
+                  loading={loaders[`loader__${field.key}`] ?? false}
+                  value={formik.values[field.key]}
+                  getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
+                  isOptionEqualToValue={(option, value) => !value || option === value || option[field.itemValue] === value || option[field.itemValue] === value[field.itemValue]}
+                  inputValue={
+                    asyncList[`asyncList__${field.key}`]?.find((obj) => obj[field.itemValue] === formik.values[field.key])?.[field.itemText] || ''
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      label={field.label}
+                      error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                      helperText={formik.touched[field.key] && formik.errors[field.key]}
+                    />)}
+                  onChange={(e, newVal, type) => {
+
+                    if (type === 'clear') {
+                      const val = typeof newVal === 'string' ? '' : null;
+                      formik.setFieldValue(field.key, val);
+                      setLastChangedField({ key: field.key, val })
+                    } else {
+                      const val = typeof newVal === 'string' ? newVal : newVal[field.itemValue];
+                      formik.setFieldValue(field.key, val);
+                      setLastChangedField({ key: field.key, val })
+                    }
+                  }}
+                  defaultValue={field.defaultValue}
+                  onBlur={formik.handleBlur}
                 />
               ) : field.type === 'pipeSizeCheckBoxes' ? (
                 <>
                   <Autocomplete
+                    name={field.key}
                     sx={{ flexGrow: 1 }}
                     size="small"
                     disabled={!!field.disabled}
                     readOnly
                     multiple
+                    disableClearable
                     limitTags={6}
                     options={field.items}
                     defaultValue={field.defaultValue}
-                    value={formDataLocal[field.key]}
+                    value={formik.values[field.key]}
                     isOptionEqualToValue={(option, value) => option._id === value}
+
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label={field.label}
                         variant="standard"
+                        label={field.label}
+                        error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                        helperText={formik.touched[field.key] && formik.errors[field.key]}
                       />
                     )}
                     onOpen={() => setDialogs(prevState => {
@@ -214,27 +361,29 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                       updatedDialogs[field.key] = true;
                       return updatedDialogs;
                     })}
-                    // onChange={(e, newVal) => handleFieldChange(field.key, newVal)}
+
                     renderTags={(value, getTagProps) =>
                       value.map((option, index) => {
                         const labelObj = field.items.find(({ _id }) => _id === option)
-                        const label = formDataLocal[field.unitTypeKey] === 'mm' ? labelObj.metricDisplayText : labelObj.imperialDisplayText
+                        const label = formik.values[field.unitTypeKey] === 'mm' ? labelObj.metricDisplayText : labelObj.imperialDisplayText
                         return <Chip
                           variant="outlined"
                           clickable
                           label={label}
-                          {...getTagProps({ index })} />
+                          {...getTagProps({ index })}
+                        />
                       }
                       )}
+                    onBlur={formik.handleBlur}
 
                   />
 
                   <Dialog open={dialogs[field.key] || false} >
                     <PipeSizesDialog
-                      unitType={formDataLocal[field.unitTypeKey]}
+                      unitType={formik.values[field.unitTypeKey]}
                       items={field.items}
                       handleClose={() => handlePipeSizeDialogClose(field.key)}
-                      selected={getSelectedPipes(formDataLocal[field.key])}
+                      selected={getSelectedPipes(formik.values[field.key])}
                       handleSubmit={(data) => handlePipeSizeSubmit(field.key, data)}
                     />
                   </Dialog>
@@ -243,112 +392,38 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                 </>
               ) : field.type === 'boolean' ? (
                 <FormControlLabel
+                  name={field.key}
                   control={<Switch
-                    checked={formDataLocal[field.key]}
-                    onChange={(e, newVal) => handleFieldChange(field.key, newVal)}
+                    checked={formik.values[field.key]}
+                    onChange={(e, val) => {
+                      formik.handleChange(e);
+                      setLastChangedField({ key: field.key, val })
+                    }}
                   />}
+                  error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                  helperText={formik.touched[field.key] && formik.errors[field.key]}
                   label={field.label} />
               ) : (
                 <></>
               )}
             </Box>
           ))}
-        </FormControl>
-      </CardContent>
-      <CardActions sx={{ justifyContent: 'space-around' }}>
-        <Button variant="outlined" onClick={handleCancel}>
-          Cancel
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
-      </CardActions>
+        </CardContent>
+        <CardActions sx={{ justifyContent: 'space-around' }}>
+          <Button variant="outlined" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" type="submit">
+            Submit
+          </Button>
+        </CardActions>
+      </form>
+
     </Card >
   );
 };
 
 export default CustomForm;
-
-
-// const [asyncList, setAsyncList] = useState({})
-// const [refsList, setRefsList] = useState({})
-// const [loaders, setLoaders] = useState({})
-
-// intializing neccesary variables
-// const initalizeAsynclist = (key) => {
-//     setAsyncList((prevVal) => {
-//         return { ...prevVal, [`asyncList__${key}`]: [] };
-//     })
-// }
-
-// const initalizeRefs = (key) => {
-//     setRefsList((prevVal) => {
-//         return { ...prevVal, [`refs__${key}`]: null };
-//     })
-// }
-
-// const initalizeLoaders = (key) => {
-//     setLoaders((prevVal) => {
-//         return { ...prevVal, [`loader__${key}`]: false };
-//     })
-// };
-
-// const handleApicalls = async (config, e) => {
-//     if (refsList[`refs__${config.key}`]) {
-//         clearTimeout(refsList[`refs__${config.key}`]);
-//         setRefsList((prevVal) => {
-//             return { ...prevVal, [`refs__${config.key}`]: null }
-//         })
-//     }
-
-//     setRefsList((prevVal) => {
-//         return {
-//             ...prevVal, [`refs__${config.key}`]: setTimeout(async () => {
-
-//                 setLoaders((prevVal) => {
-//                     return { ...prevVal, [`loader__${config.key}`]: true }
-//                 })
-
-//                 const result = await config.apiCall({
-//                     search: e ?? "",
-//                     ...config.params,
-//                 });
-//                 if (result) {
-//                     setAsyncList((prevVal) => {
-//                         return {
-//                             ...prevVal,
-//                             [`asyncList__${config.key}`]: result.data
-//                         }
-//                     })
-
-//                     setLoaders((prevVal) => {
-//                         return {
-//                             ...prevVal,
-//                             [`loader__${config.key}`]: false
-//                         }
-//                     })
-//                 }
-//             }, 300)
-//         }
-//     })
-
-// };
-
-
-
-// if (config.type == "asyncAutocomplete") {
-//     // initalizeAsynclist(config.key);
-//     // initalizeRefs(config.key);
-//     // initalizeLoaders(config.key);
-//     // handleApicalls(
-//     //     config,
-//     //     formDataLocal[config.key] &&
-//     //         formDataLocal[config.key][config.itemText]
-//     //         ? formDataLocal[config.key][config.itemText]
-//     //         : ""
-//     // );
-// }
-
 
 
 
@@ -362,5 +437,3 @@ export default CustomForm;
 //         formDataLocal[config.key] = null;
 //     }
 // }
-
-

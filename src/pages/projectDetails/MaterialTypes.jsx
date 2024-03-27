@@ -5,6 +5,7 @@ import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
 import { addMaterialTypesData, deleteMaterialTypesData, deleteMultiMaterialTypesData, getMaterialTypesData, updateMaterialTypesData } from "../../stores/materialTypes"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 const formDataInitial = {
     name: "",
@@ -61,6 +62,11 @@ const MaterialTypes = () => {
                 ],
             },
         ],
+        formValidations: {
+            name: yup.string().required('Name is required.'),
+            code: yup.string().required('Code is required.')
+                .max(3, 'Code must be a maximum of 3 characters.')
+        }
     }
 
     const fetchData = async (data) => {

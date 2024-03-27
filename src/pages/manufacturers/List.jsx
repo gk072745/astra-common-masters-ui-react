@@ -4,21 +4,24 @@ import { useEffect, useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
 import { clone } from "lodash"
-import { addDWVPipeFittingParametersData, deleteDWVPipeFittingParametersData, deleteMultiDWVPipeFittingParametersData, getDWVPipeFittingParametersData, updateDWVPipeFittingParametersData } from "../../stores/dwvPipeFittingParameters"
 import { exportTables, importData } from "../../stores/importAndExport"
 import * as yup from 'yup'
+import { addManufacturersData, deleteManufacturersData, deleteMultiManufacturersData, getManufacturersData, updateManufacturersData } from "../../stores/manufacturersList"
+import { getCountryData } from "../../stores/country"
 
 
 const initialFormData = {
-    description: "",
-    type: '',
-    isMandatory: false,
-    notes: ''
+    manufacturerName: "",
+    manufacturerCode: '',
+    country: '',
+    unitType: '',
+    notes: '',
 }
 
-const DWVPipeFittingParameters = () => {
+
+const List = () => {
     const dispatch = useDispatch()
-    const { dwvPipeFittingParameters: items } = useSelector((store) => store.dwvPipeFittingParametersReducer)
+    const { manufacturers: items } = useSelector((store) => store.manufacturersReducer)
     const [rowCount, setRowCount] = useState(0)
     const [showForm, setShowForm] = useState(false)
     const queriesRef = useRef(null)
@@ -26,16 +29,41 @@ const DWVPipeFittingParameters = () => {
 
     const columns = [
         {
-            field: 'description',
-            headerName: 'DESCRIPTION',
+            field: 'manufacturerName',
+            headerName: 'Manufacturer Name',
             flex: 1,
             editable: false,
             headerAlign: 'left',
             align: 'left',
         },
         {
-            field: 'type',
-            headerName: 'TYPE',
+            field: 'manufacturerCode',
+            headerName: 'Manufacturer Code',
+            flex: 1,
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'country.country_code',
+            headerName: 'Country Code',
+            flex: 1,
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+            valueGetter: params => params.row.country.country_code,
+        },
+        {
+            field: 'compositeCode',
+            headerName: 'Composite Code',
+            flex: 1,
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'unitType',
+            headerName: 'Unit Type',
             flex: 1,
             editable: false,
             headerAlign: 'center',
@@ -49,80 +77,55 @@ const DWVPipeFittingParameters = () => {
             headerAlign: 'center',
             align: 'center',
         },
-        {
-            field: 'isMandatory',
-            headerName: 'IS Mandatory',
-            flex: 1,
-            editable: false,
-            headerAlign: 'center',
-            align: 'center',
-            renderCell: ({ row }) => (
-                row.isMandatory ? 'True' : 'False'
-            )
-        },
     ];
 
     const formConfig = {
-        formHeader: "Material Types",
-        formRef: "PipeParameters",
+        formHeader: "Add a Manufacturer",
+        formRef: "manufacturer",
         formFields: [
             {
                 type: "text",
-                key: "description",
-                label: "Description*",
-                placeholder: "Description*",
+                key: "manufacturerName",
+                label: "Manufacturer name*",
+                placeholder: "Manufacturer name*",
+            },
+            {
+                type: "text",
+                key: "manufacturerCode",
+                label: "Manufacturer code*",
+                placeholder: "Manufacturer code*",
+            },
+            {
+                type: "asyncAutocomplete",
+                key: "country",
+                label: "Country*",
+                placeholder: "Country*",
+                itemText: "name",
+                itemValue: "_id",
+                returnObject: true,
+                apiCall: getCountryData,
                 validations: ["required"],
             },
             {
                 type: "autocomplete",
-                key: "type",
-                label: "Type*",
-                placeholder: "Type*",
-                items: [
-                    {
-                        text: "Date",
-                        value: "Date",
-                    },
-                    {
-                        text: "Text",
-                        value: "Text",
-                    },
-                    {
-                        text: "Number",
-                        value: "Number",
-                    },
-                    {
-                        text: "Boolean(Y/N)",
-                        value: "Boolean",
-                    },
-                    {
-                        text: "Image",
-                        value: "Image",
-                    },
-
-                ],
-                itemText: "text",
-                itemValue: "value",
+                key: "unitType",
+                label: "Unit Type*",
                 validations: ["required"],
-                defaultValue: '',
-            },
-            {
-                key: 'isMandatory',
-                type: "boolean",
-                label: "Mandatory",
-                placeholder: "Mandatory",
+                placeholder: "Unit Type",
+                items: ["mm", "in"],
             },
             {
                 type: "textarea",
-                key: "notes",
+                key: 'notes',
                 label: "Notes",
                 placeholder: "Notes",
             },
         ],
         formValidations: {
-            description: yup.string().required('Description is required.'),
-            type: yup.string().required('Type is required.'),
-            isMandatory: yup.boolean().required('Please select the mandatory option.'),
+            manufacturerName: yup.string().required('Manufacturer Name is required.'),
+            manufacturerCode: yup.string().required('Manufacturer Code is required.'),
+            country: yup.string().required('Country is required.'),
+            unitType: yup.string().required('Unit Type is required.'),
             notes: yup.string(),
         }
     }
@@ -139,7 +142,7 @@ const DWVPipeFittingParameters = () => {
             sortOrder: sortModel?.length ? sortModel[0].sort : "",
         }
 
-        const res = await dispatch(getDWVPipeFittingParametersData(options))
+        const res = await dispatch(getManufacturersData(options))
         console.log(res)
 
         if (res.status === 200) {
@@ -148,55 +151,60 @@ const DWVPipeFittingParameters = () => {
     }
 
     const handleDeleteAllClicked = async (ids = []) => {
-        await dispatch(deleteMultiDWVPipeFittingParametersData({ ids }))
+        await dispatch(deleteMultiManufacturersData({ ids }))
         await fetchData(queriesRef.current)
     }
 
     const handleDeleteRow = async (data = {}) => {
-        await dispatch(deleteDWVPipeFittingParametersData(data))
+        await dispatch(deleteManufacturersData(data))
         await fetchData(queriesRef.current)
     }
 
     const handleSubmitClicked = async (data) => {
+        data.compositeCode = `${data.manufacturerCode}_${data.country.country_code}`
 
+        console.log(data)
+        return;
         if (!data._id) {
-            await dispatch(addDWVPipeFittingParametersData(data))
+            await dispatch(addManufacturersData(data))
         } else {
-            await dispatch(updateDWVPipeFittingParametersData(data))
+            // Object.keys(modifedFormData).forEach(key => {
+            //     formData[key] = modifedFormData[key]
+            // })
+
+            // await dispatch(updateManufacturersData({ id: formData._id, data: formData }))
         }
 
         closeForm()
 
-        await fetchData(queriesRef.current)
+        // await fetchData(queriesRef.current)
 
     }
 
     const handleImportBtnClicked = async (data) => {
-        const res = await dispatch(importData({ modalName: "DWVPipeFittingParameters", file: data }));
+        const res = await dispatch(importData({ modalName: "Manufacturers", file: data }));
         console.log(res)
     }
 
     const handleExportOptionClicked = async (data) => {
-        await dispatch(exportTables({ type: 'DWVPipeFittingParameters', ...data }))
+        await dispatch(exportTables({ type: 'Manufacturers', ...data }))
     }
 
     const openForm = (data = initialFormData) => {
         const formData = clone(data)
-
+        formData._id && (formData.country = formData.country._id)
         setFormData(formData)
         setShowForm(true)
     }
 
     const closeForm = (() => {
-        setFormData(initialFormData)
         setShowForm(false)
+        setFormData(initialFormData)
     })
-
-    console.log(items)
 
     return <>
         <div className="table-header">
-            DWV Pipe Parameters
+            Manufacturers List
             <Dialog open={showForm} >
                 {showForm && <CustomForm
                     formData={formData}
@@ -212,7 +220,7 @@ const DWVPipeFittingParameters = () => {
                 columns={columns}
                 rows={items}
                 addDataText='ADD FIELD'
-                tableName='DWVPipeFittingParameters'
+                tableName='CommonProductFields'
                 rowCount={rowCount}
                 fetchData={fetchData}
                 deleteAllCicked={handleDeleteAllClicked}
@@ -225,4 +233,4 @@ const DWVPipeFittingParameters = () => {
     </>
 }
 
-export default DWVPipeFittingParameters
+export default List

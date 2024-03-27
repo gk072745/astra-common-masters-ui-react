@@ -583,7 +583,6 @@ export const deleteMultiValveParameters = async data => {
 
 
 
-
 export const getMechanicalEquipmentParameters = async data => {
 
   const urlWithQuery = routes.MechanicalEquipmentParameters + encodedURL(data)
@@ -613,6 +612,41 @@ export const deleteMechanicalEquipmentParameters = async ({ _id }) => {
 export const deleteMultiMechanicalEquipmentParameters = async data => {
 
   const urlWithQuery = routes.MechanicalEquipmentParameters + 'delete/multiple'
+
+  return postAPIResponse(urlWithQuery, data)
+}
+
+
+
+export const getManufacturers = async data => {
+
+  const urlWithQuery = routes.Manufacturers + encodedURL(data)
+
+  return getAPIResponse(urlWithQuery)
+}
+
+export const addManufacturers = async data => {
+
+  return postAPIResponse(routes.Manufacturers, data)
+}
+
+export const updateManufacturers = async data => {
+  const { _id } = data
+  const requestRoute = routes.Manufacturers + _id
+
+  return putAPIResponse(requestRoute, data)
+}
+
+export const deleteManufacturers = async ({ _id }) => {
+
+  const urlWithQuery = routes.Manufacturers + _id
+
+  return deleteAPIResponse(urlWithQuery)
+}
+
+export const deleteMultiManufacturers = async data => {
+
+  const urlWithQuery = routes.Manufacturers + 'delete/multiple'
 
   return postAPIResponse(urlWithQuery, data)
 }

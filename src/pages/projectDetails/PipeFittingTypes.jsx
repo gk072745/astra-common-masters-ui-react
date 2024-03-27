@@ -6,6 +6,7 @@ import CustomForm from "../../components/CustomForm"
 import { clone } from "lodash"
 import { addPipeFittingTypesData, deleteMultiPipeFittingTypesData, deletePipeFittingTypesData, getPipeFittingTypesData, updatePipeFittingTypesData } from "../../stores/pipeFittingTypes"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 
 const initialFormData = {
@@ -76,6 +77,13 @@ const PipeFittingTypes = () => {
                 placeholder: "Notes",
             },
         ],
+        formValidations: {
+            description: yup.string().required('Description is required.'),
+            numberOfConnections: yup.string()
+                .matches(/^\d+$/, 'Number Of Connections must be a number.')
+                .required('Number Of Connections is required.'),
+            notes: yup.string(),
+        }
     }
 
     const fetchData = async (data) => {

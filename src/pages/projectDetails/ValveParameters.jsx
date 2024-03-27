@@ -6,6 +6,7 @@ import CustomForm from "../../components/CustomForm"
 import { clone } from "lodash"
 import { addValveParametersData, deleteMultiValveParametersData, deleteValveParametersData, getValveParametersData, updateValveParametersData } from "../../stores/valveParameters"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 
 const initialFormData = {
@@ -118,6 +119,12 @@ const ValveParameters = () => {
                 placeholder: "Notes",
             },
         ],
+        formValidations: {
+            description: yup.string().required('Description is required.'),
+            type: yup.string().required('Type is required.'),
+            isMandatory: yup.boolean().required('Please select the mandatory option.'),
+            notes: yup.string(),
+        }
     }
 
     const fetchData = async (data) => {

@@ -6,7 +6,7 @@ import CustomForm from "../../components/CustomForm"
 import { clone } from "lodash"
 import { addPipeNetworkTypesData, deleteMultiPipeNetworkTypesData, deletePipeNetworkTypesData, getPipeNetworkTypesData, updatePipeNetworkTypesData } from "../../stores/pipeNetworkTypes"
 import { exportTables, importData } from "../../stores/importAndExport"
-
+import * as yup from 'yup'
 
 const initialFormData = {
     name: "",
@@ -62,6 +62,11 @@ const PipeNetworkType = () => {
                 ],
             },
         ],
+        formValidations: {
+            name: yup.string().required('Name is required.'),
+            code: yup.string().required('Code is required.')
+                .max(8, 'Code must be a maximum of 8 characters.')
+        }
     }
 
     const fetchData = async (data) => {

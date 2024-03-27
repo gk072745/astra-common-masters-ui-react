@@ -5,6 +5,7 @@ import { useRef, useState } from "react"
 import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 const initialFormData = {
     mainCategory: "",
@@ -65,6 +66,11 @@ const ProductTypes = () => {
                 validations: ["required"],
             },
         ],
+        formValidations: {
+            mainCategory: yup.string().required('Main Category is required.'),
+            masterCategory: yup.string().required('Master Category is required.'),
+            subCategory: yup.string().required('Sub Category is required.'),
+        }
     }
 
 

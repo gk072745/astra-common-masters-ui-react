@@ -1,5 +1,6 @@
 import ImportLogs from "../pages/ImportLogs";
 import Login from "../pages/Login";
+import List from "../pages/manufacturers/List";
 import CommonProductFields from "../pages/projectDetails/CommonProductFields";
 import ConnectionTypes from "../pages/projectDetails/ConnectionTypes";
 import Country from "../pages/projectDetails/Country";
@@ -108,5 +109,10 @@ export const routes = [
         path: '/product-details-mech-equip-prms',
         isPrivate: true,
         Component: MechEquParams
+    },
+    {
+        path: '/manufacturers-list',
+        isPrivate: true,
+        Component: List
     },
 ]

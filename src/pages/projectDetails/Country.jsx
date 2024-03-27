@@ -5,6 +5,7 @@ import { Dialog } from "@mui/material"
 import CustomForm from "../../components/CustomForm"
 import { addCountryData, deleteCountryData, deleteMultiCountryData, getCountryData, updateCountryData } from "../../stores/country"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 const initialFormData = {
     name: "",
@@ -76,6 +77,11 @@ const Country = () => {
                 placeholder: "Notes",
             },
         ],
+        formValidations: {
+            name: yup.string().required('Name is required.'),
+            country_code: yup.string().required('Country code is required.'),
+            notes: yup.string().required('Notes is required.'),
+        }
     }
 
     const fetchData = async (data) => {

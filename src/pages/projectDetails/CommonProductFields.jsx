@@ -6,6 +6,7 @@ import CustomForm from "../../components/CustomForm"
 import { clone } from "lodash"
 import { addCommonProductFieldsData, deleteCommonProductFieldsData, deleteMultiCommonProductFieldsData, getCommonProductFieldsData, updateCommonProductFieldsData } from "../../stores/commonProductFields"
 import { exportTables, importData } from "../../stores/importAndExport"
+import * as yup from 'yup'
 
 
 const initialFormData = {
@@ -117,6 +118,12 @@ const CommonProductFields = () => {
                 placeholder: "Notes",
             },
         ],
+        formValidations: {
+            description: yup.string().required('Description is required.'),
+            type: yup.string().required('Type is required.'),
+            isMandatory: yup.boolean().required('Please select the mandatory option.'),
+            notes: yup.string(),
+        }
     }
 
     const fetchData = async (data) => {

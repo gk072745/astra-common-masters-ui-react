@@ -19,13 +19,16 @@ import { reducer as pipeFittingTypesReducer } from './pipeFittingTypes';
 import { reducer as plumbingFixtureParametersReducer } from './plumbingFixtureParameters';
 import { reducer as valveParametersReducer } from './valveParameters';
 import { reducer as mechEquParamsReducer } from './mechanicalEquipmentParameters';
+import { reducer as manufacturersReducer } from './manufacturersList';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const rootReducer = combineReducers({
-    importLogsReducer, uiFeedbackReducer,
-    productTypesReducer, sampleFileReducer,
-    countryReducer, MasterPipesReducer, materialTypesReducer, connectionTypesReducer, genericPipeSystemsReducer, pipeNetworkTypesReducer, commonProductFieldsReducer, pipeParametersReducer, normalPipeFittingParametersReducer, specialPipeFittingParametersReducer, dwvPipeFittingParametersReducer, pipeFittingTypesReducer, plumbingFixtureParametersReducer, valveParametersReducer, mechEquParamsReducer
+    importLogsReducer, uiFeedbackReducer, productTypesReducer, sampleFileReducer, countryReducer,
+    MasterPipesReducer, materialTypesReducer, connectionTypesReducer, genericPipeSystemsReducer,
+    pipeNetworkTypesReducer, commonProductFieldsReducer, pipeParametersReducer, normalPipeFittingParametersReducer,
+    specialPipeFittingParametersReducer, dwvPipeFittingParametersReducer, pipeFittingTypesReducer,
+    plumbingFixtureParametersReducer, valveParametersReducer, mechEquParamsReducer, manufacturersReducer,
 });
 
 export const store = legacy_createStore(

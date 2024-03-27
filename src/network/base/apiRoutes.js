@@ -21,4 +21,5 @@ export const routes = {
   PlumbingFixtureParameters: `PlumbingFixtureParameters/${apiVersion}/`,
   ValveParameters: `ValveParameters/${apiVersion}/`,
   MechanicalEquipmentParameters: `MechanicalEquipmentParameters/${apiVersion}/`,
+  Manufacturers: `Manufacturers/${apiVersion}/`,
 }
