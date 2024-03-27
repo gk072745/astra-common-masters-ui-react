@@ -124,7 +124,12 @@ const List = () => {
         formValidations: {
             manufacturerName: yup.string().required('Manufacturer Name is required.'),
             manufacturerCode: yup.string().required('Manufacturer Code is required.'),
-            country: yup.string().required('Country is required.'),
+            country: yup.object().shape({
+                _id: yup.string().required('Country ID is required'),
+                name: yup.string().required('Country name is required'),
+                country_code: yup.string().required('Country code is required'),
+                isDisabled: yup.boolean().required('Country disabled status is required')
+            }).required('Country details are required'),
             unitType: yup.string().required('Unit Type is required.'),
             notes: yup.string(),
         }
@@ -161,23 +166,21 @@ const List = () => {
     }
 
     const handleSubmitClicked = async (data) => {
-        data.compositeCode = `${data.manufacturerCode}_${data.country.country_code}`
-
         console.log(data)
-        return;
+        const modifedFormData = {
+            ...data,
+            compositeCode: `${data.manufacturerCode}_${data.country.country_code}`,
+            country: data.country._id,
+        }
+        return
         if (!data._id) {
-            await dispatch(addManufacturersData(data))
+            await dispatch(addManufacturersData(modifedFormData))
         } else {
-            // Object.keys(modifedFormData).forEach(key => {
-            //     formData[key] = modifedFormData[key]
-            // })
-
-            // await dispatch(updateManufacturersData({ id: formData._id, data: formData }))
+            await dispatch(updateManufacturersData(modifedFormData))
         }
 
         closeForm()
-
-        // await fetchData(queriesRef.current)
+        await fetchData(queriesRef.current)
 
     }
 
@@ -192,7 +195,6 @@ const List = () => {
 
     const openForm = (data = initialFormData) => {
         const formData = clone(data)
-        formData._id && (formData.country = formData.country._id)
         setFormData(formData)
         setShowForm(true)
     }

@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, Chip, Dialog, FormControl, FormControlLabel, Switch, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Dialog, FormControl, FormControlLabel, Switch, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import PipeSizesDialog from "./PipeSizesDialog";
 import { useFormik } from "formik";
@@ -181,6 +181,42 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
 
   };
 
+  const isOptionEqualToValue = (option, value, itemValue) => {
+    return !value || option === value || option[itemValue] === value || option[itemValue] === value[itemValue]
+  }
+
+  const handleOnChangeAutocomplete = (e, newVal, type, field) => {
+    if (type === 'clear') {
+      const val = field.returnObject ? null : '';
+      formik.setFieldValue(field.key, val);
+      setLastChangedField({ key: field.key, val })
+    } else {
+      const val = field.returnObject || typeof newVal === 'string' ? newVal : newVal[field.itemValue];
+      formik.setFieldValue(field.key, val);
+      setLastChangedField({ key: field.key, val })
+    }
+  }
+
+  const autocompleteInputValue = (val, options, field) => {
+    const valType = typeof val
+    if (!options || options.length === 0) {
+      return ''
+    }
+
+    const optionsType = typeof options[0]
+
+    if (optionsType === 'string') {
+      return val
+    } else if (valType === 'string') {
+      const selectedOption = options.find((obj) => obj[field.itemValue] === val)
+      return selectedOption ? selectedOption[field.itemText] : ''
+    } else {
+
+      return val ? val[field.itemText] : ''
+    }
+
+  }
+
   useEffect(() => {
     formConfigLocal.formFields.forEach((config) => {
 
@@ -223,7 +259,6 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
       checkDependency(key, formik.values[key], formik.values);
     }
   }, [dependencies])
-
 
   useEffect(() => {
     checkDependency(lastChangedField.key, lastChangedField.val)
@@ -272,7 +307,7 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                   options={field.items}
                   value={formik.values[field.key]}
                   getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
-                  isOptionEqualToValue={(option, value) => !value || option === value || option[field.itemValue] === value || option[field.itemValue] === value[field.itemValue]}
+                  isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -282,16 +317,9 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                       helperText={formik.touched[field.key] && formik.errors[field.key]}
                     />)}
                   onChange={(e, newVal, type) => {
-                    if (type === 'clear') {
-                      const val = typeof newVal === 'string' ? '' : null;
-                      formik.setFieldValue(field.key, val);
-                      setLastChangedField({ key: field.key, val })
-                    } else {
-                      const val = typeof newVal === 'string' ? newVal : newVal[field.itemValue];
-                      formik.setFieldValue(field.key, val);
-                      setLastChangedField({ key: field.key, val })
-                    }
+                    handleOnChangeAutocomplete(e, newVal, type, field)
                   }}
+                  // inputValue={autocompleteInputValue(formik.values[field.key], field.items, field)}
                   defaultValue={field.defaultValue}
                   onBlur={formik.handleBlur}
                 />
@@ -300,14 +328,11 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                   name={field.key}
                   sx={{ flexGrow: 1 }}
                   size="small"
-                  options={asyncList[`asyncList__${field.key}`] ?? []}
+                  options={asyncList[`asyncList__${field.key}`] || []}
                   loading={loaders[`loader__${field.key}`] ?? false}
                   value={formik.values[field.key]}
                   getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
-                  isOptionEqualToValue={(option, value) => !value || option === value || option[field.itemValue] === value || option[field.itemValue] === value[field.itemValue]}
-                  inputValue={
-                    asyncList[`asyncList__${field.key}`]?.find((obj) => obj[field.itemValue] === formik.values[field.key])?.[field.itemText] || ''
-                  }
+                  isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -315,19 +340,27 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                       label={field.label}
                       error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
                       helperText={formik.touched[field.key] && formik.errors[field.key]}
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loaders[`loader__${field.key}`] ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
                     />)}
-                  onChange={(e, newVal, type) => {
-
-                    if (type === 'clear') {
-                      const val = typeof newVal === 'string' ? '' : null;
-                      formik.setFieldValue(field.key, val);
-                      setLastChangedField({ key: field.key, val })
-                    } else {
-                      const val = typeof newVal === 'string' ? newVal : newVal[field.itemValue];
-                      formik.setFieldValue(field.key, val);
-                      setLastChangedField({ key: field.key, val })
-                    }
+                  onInputChange={(ev, newVal) => {
+                    handleApicalls(field, newVal)
                   }}
+                  onChange={(e, newVal, type) => {
+                    console.log(e, newVal, type)
+                    handleOnChangeAutocomplete(e, newVal, type, field)
+                  }}
+
+                  // inputValue={
+                  //   autocompleteInputValue(formik.values[field.key], asyncList[`asyncList__${field.key}`] || [], field)
+                  // }
                   defaultValue={field.defaultValue}
                   onBlur={formik.handleBlur}
                 />
@@ -346,7 +379,6 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
                     defaultValue={field.defaultValue}
                     value={formik.values[field.key]}
                     isOptionEqualToValue={(option, value) => option._id === value}
-
                     renderInput={(params) => (
                       <TextField
                         {...params}
