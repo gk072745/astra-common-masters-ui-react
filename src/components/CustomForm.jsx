@@ -1,10 +1,11 @@
 import { cloneDeep } from "lodash";
-import { Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Dialog, FormControl, FormControlLabel, Switch, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Dialog, FormControl, FormControlLabel, Grid, Switch, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import PipeSizesDialog from "./PipeSizesDialog";
 import { useFormik } from "formik";
 import * as yup from 'yup'
 import { useDispatch } from "react-redux";
+import PipeSizesPopup from "./PipeSizesPopup";
 
 
 
@@ -107,7 +108,7 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
     }
   }
 
-  const handlePipeSizeDialogClose = (key) => {
+  const handleDialogClose = (key) => {
     setDialogs(prevState => {
       const updatedDialogs = [...prevState];
       updatedDialogs[key] = false;
@@ -118,7 +119,7 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
   const handlePipeSizeSubmit = (key, val) => {
     formik.setFieldValue(key, val);
     setLastChangedField(key, val)
-    handlePipeSizeDialogClose(key)
+    handleDialogClose(key)
   }
 
   // intializing neccesary variables
@@ -241,7 +242,7 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
         });
       }
 
-      if (config.type == "pipeSizeCheckBoxes") {
+      if (config.type == "pipeSizeCheckBoxes" || config.type == "sizesPopup") {
         setDialogs(prevState => {
           const updatedDialogs = [...prevState];
           updatedDialogs[config.key] = false;
@@ -265,181 +266,244 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
   }, [formik.values])
 
 
-  return (
-    <Card sx={{ padding: '1.5rem' }}>
-      <form onSubmit={formik.handleSubmit}>
 
+  useEffect(() => {
+    console.log(formConfigLocal)
+  }, [formConfigLocal])
+
+  return (
+
+    <form onSubmit={formik.handleSubmit}>
+      <Card sx={{ padding: '1.5rem' }}>
         <CardHeader title={formConfigLocal.formHeader} />
         <CardContent>
-          {formConfigLocal.formFields?.map((field, key) => (
-            <Box key={key} sx={{ display: 'flex', marginBottom: '1rem' }}>
-              {field.type === 'text' ? (
-                <TextField
-                  name={field.key}
-                  label={field.label}
-                  sx={{ flexGrow: 1 }}
-                  variant="standard"
-                  value={formik.values[field.key]}
-                  error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
-                  helperText={formik.touched[field.key] && formik.errors[field.key]}
-                  onChange={(e) => { formik.handleChange(e); setLastChangedField({ key: field.key, val: e.target.value }) }}
-                  onBlur={formik.handleBlur}
-                />
-              ) : field.type === 'textarea' ? (
-                <TextField
-                  name={field.key}
-                  label={field.label}
-                  sx={{ flexGrow: 1 }}
-                  variant="standard"
-                  multiline
-                  rows={3}
-                  value={formik.values[field.key]}
-                  error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
-                  helperText={formik.touched[field.key] && formik.errors[field.key]}
-                  onChange={(e) => { formik.handleChange(e); setLastChangedField({ key: field.key, val: e.target.value }) }}
-                  onBlur={formik.handleBlur}
-                />
-              ) : field.type === 'autocomplete' ? (
-                <Autocomplete
-                  name={field.key}
-                  sx={{ flexGrow: 1 }}
-                  size="small"
-                  options={field.items}
-                  value={formik.values[field.key]}
-                  getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
-                  isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="standard"
-                      label={field.label}
-                      error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
-                      helperText={formik.touched[field.key] && formik.errors[field.key]}
-                    />)}
-                  onChange={(e, newVal, type) => {
-                    handleOnChangeAutocomplete(e, newVal, type, field)
-                  }}
-                  // inputValue={autocompleteInputValue(formik.values[field.key], field.items, field)}
-                  defaultValue={field.defaultValue}
-                  onBlur={formik.handleBlur}
-                />
-              ) : field.type === 'asyncAutocomplete' ? (
-                <Autocomplete
-                  name={field.key}
-                  sx={{ flexGrow: 1 }}
-                  size="small"
-                  options={asyncList[`asyncList__${field.key}`] || []}
-                  loading={loaders[`loader__${field.key}`] ?? false}
-                  value={formik.values[field.key]}
-                  getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
-                  isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="standard"
-                      label={field.label}
-                      error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
-                      helperText={formik.touched[field.key] && formik.errors[field.key]}
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {loaders[`loader__${field.key}`] ? <CircularProgress color="inherit" size={20} /> : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
-                      }}
-                    />)}
-                  onInputChange={(ev, newVal) => {
-                    handleApicalls(field, newVal)
-                  }}
-                  onChange={(e, newVal, type) => {
-                    console.log(e, newVal, type)
-                    handleOnChangeAutocomplete(e, newVal, type, field)
-                  }}
-
-                  // inputValue={
-                  //   autocompleteInputValue(formik.values[field.key], asyncList[`asyncList__${field.key}`] || [], field)
-                  // }
-                  defaultValue={field.defaultValue}
-                  onBlur={formik.handleBlur}
-                />
-              ) : field.type === 'pipeSizeCheckBoxes' ? (
-                <>
-                  <Autocomplete
-                    name={field.key}
-                    sx={{ flexGrow: 1 }}
-                    size="small"
-                    disabled={!!field.disabled}
-                    readOnly
-                    multiple
-                    disableClearable
-                    limitTags={6}
-                    options={field.items}
-                    defaultValue={field.defaultValue}
-                    value={formik.values[field.key]}
-                    isOptionEqualToValue={(option, value) => option._id === value}
-                    renderInput={(params) => (
+          <Grid container={!!formConfigLocal.container} spacing={2} >
+            {
+              formConfigLocal.formFields?.map((field, key) => (
+                <Grid key={key} item xs={field.cols || 12} sx={{ marginBottom: '1rem' }}>
+                  {
+                    field.type === 'text' ? (
                       <TextField
-                        {...params}
-                        variant="standard"
+                        name={field.key}
                         label={field.label}
+                        sx={{ flexGrow: 1 }}
+                        variant="standard"
+                        value={formik.values[field.key]}
                         error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
                         helperText={formik.touched[field.key] && formik.errors[field.key]}
+                        onChange={(e) => { formik.handleChange(e); setLastChangedField({ key: field.key, val: e.target.value }) }}
+                        onBlur={formik.handleBlur}
                       />
-                    )}
-                    onOpen={() => setDialogs(prevState => {
-                      const updatedDialogs = [...prevState];
-                      updatedDialogs[field.key] = true;
-                      return updatedDialogs;
-                    })}
+                    ) : field.type === 'textarea' ? (
+                      <TextField
+                        name={field.key}
+                        label={field.label}
+                        sx={{ flexGrow: 1 }}
+                        variant="standard"
+                        multiline
+                        rows={3}
+                        value={formik.values[field.key]}
+                        error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                        helperText={formik.touched[field.key] && formik.errors[field.key]}
+                        onChange={(e) => { formik.handleChange(e); setLastChangedField({ key: field.key, val: e.target.value }) }}
+                        onBlur={formik.handleBlur}
+                      />
+                    ) : field.type === 'autocomplete' ? (
+                      <Autocomplete
+                        name={field.key}
+                        sx={{ flexGrow: 1 }}
+                        size="small"
+                        options={field.items}
+                        value={formik.values[field.key]}
+                        getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
+                        isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="standard"
+                            label={field.label}
+                            error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                            helperText={formik.touched[field.key] && formik.errors[field.key]}
+                          />)}
+                        onChange={(e, newVal, type) => {
+                          handleOnChangeAutocomplete(e, newVal, type, field)
+                        }}
+                        // inputValue={autocompleteInputValue(formik.values[field.key], field.items, field)}
+                        defaultValue={field.defaultValue}
+                        onBlur={formik.handleBlur}
+                      />
+                    ) : field.type === 'asyncAutocomplete' ? (
+                      <Autocomplete
+                        name={field.key}
+                        sx={{ flexGrow: 1 }}
+                        size="small"
+                        options={asyncList[`asyncList__${field.key}`] || []}
+                        loading={loaders[`loader__${field.key}`] ?? false}
+                        value={formik.values[field.key]}
+                        getOptionLabel={(option) => typeof option === 'string' ? option : option[field.itemText]}
+                        isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="standard"
+                            label={field.label}
+                            error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                            helperText={formik.touched[field.key] && formik.errors[field.key]}
+                            InputProps={{
+                              ...params.InputProps,
+                              endAdornment: (
+                                <>
+                                  {loaders[`loader__${field.key}`] ? <CircularProgress color="inherit" size={20} /> : null}
+                                  {params.InputProps.endAdornment}
+                                </>
+                              ),
+                            }}
+                          />)}
+                        onInputChange={(ev, newVal) => {
+                          handleApicalls(field, newVal)
+                        }}
+                        onChange={(e, newVal, type) => {
+                          console.log(e, newVal, type)
+                          handleOnChangeAutocomplete(e, newVal, type, field)
+                        }}
 
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => {
-                        const labelObj = field.items.find(({ _id }) => _id === option)
-                        const label = formik.values[field.unitTypeKey] === 'mm' ? labelObj.metricDisplayText : labelObj.imperialDisplayText
-                        return <Chip
-                          variant="outlined"
-                          clickable
-                          label={label}
-                          {...getTagProps({ index })}
+                        // inputValue={
+                        //   autocompleteInputValue(formik.values[field.key], asyncList[`asyncList__${field.key}`] || [], field)
+                        // }
+                        defaultValue={field.defaultValue}
+                        onBlur={formik.handleBlur}
+                      />
+                    ) : field.type === 'pipeSizeCheckBoxes' ? (
+                      <>
+                        <Autocomplete
+                          name={field.key}
+                          sx={{ flexGrow: 1 }}
+                          size="small"
+                          disabled={!!field.disabled}
+                          readOnly
+                          multiple
+                          disableClearable
+                          limitTags={6}
+                          options={field.items}
+                          value={formik.values[field.key]}
+                          isOptionEqualToValue={(option, value) => option._id === value}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              variant="standard"
+                              label={field.label}
+                              error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                              helperText={formik.touched[field.key] && formik.errors[field.key]}
+                            />
+                          )}
+                          onOpen={() => setDialogs(prevState => {
+                            const updatedDialogs = [...prevState];
+                            updatedDialogs[field.key] = true;
+                            return updatedDialogs;
+                          })}
+
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => {
+                              const labelObj = field.items.find(({ _id }) => _id === option)
+                              const label = formik.values[field.unitTypeKey] === 'mm' ? labelObj.metricDisplayText : labelObj.imperialDisplayText
+                              return <Chip
+                                key={index}
+                                variant="outlined"
+                                clickable
+                                label={label}
+                                {...getTagProps({ index })}
+                              />
+                            }
+                            )}
+                          onBlur={formik.handleBlur}
+
                         />
-                      }
-                      )}
-                    onBlur={formik.handleBlur}
 
-                  />
-
-                  <Dialog open={dialogs[field.key] || false} >
-                    <PipeSizesDialog
-                      unitType={formik.values[field.unitTypeKey]}
-                      items={field.items}
-                      handleClose={() => handlePipeSizeDialogClose(field.key)}
-                      selected={getSelectedPipes(formik.values[field.key])}
-                      handleSubmit={(data) => handlePipeSizeSubmit(field.key, data)}
-                    />
-                  </Dialog>
+                        <Dialog open={dialogs[field.key] || false} >
+                          <PipeSizesDialog
+                            unitType={formik.values[field.unitTypeKey]}
+                            items={field.items}
+                            handleClose={() => handleDialogClose(field.key)}
+                            selected={getSelectedPipes(formik.values[field.key])}
+                            handleSubmit={(data) => handlePipeSizeSubmit(field.key, data)}
+                          />
+                        </Dialog>
 
 
-                </>
-              ) : field.type === 'boolean' ? (
-                <FormControlLabel
-                  name={field.key}
-                  control={<Switch
-                    checked={formik.values[field.key]}
-                    onChange={(e, val) => {
-                      formik.handleChange(e);
-                      setLastChangedField({ key: field.key, val })
-                    }}
-                  />}
-                  error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
-                  helperText={formik.touched[field.key] && formik.errors[field.key]}
-                  label={field.label} />
-              ) : (
-                <></>
-              )}
-            </Box>
-          ))}
+                      </>
+                    ) : field.type === 'boolean' ? (
+                      <FormControlLabel
+                        name={field.key}
+                        control={<Switch
+                          checked={formik.values[field.key]}
+                          onChange={(e, val) => {
+                            formik.handleChange(e);
+                            setLastChangedField({ key: field.key, val })
+                          }}
+                        />}
+                        error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                        helperText={formik.touched[field.key] && formik.errors[field.key]}
+                        label={field.label} />
+                    ) : field.type === 'sizesPopup' ? (
+                      <>
+                        <Autocomplete
+                          name={field.key}
+                          sx={{ flexGrow: 1 }}
+                          size="small"
+                          disabled={!!field.disabled}
+                          readOnly
+                          disableClearable
+                          limitTags={6}
+                          options={field.items}
+                          value={formik.values[field.key]}
+                          isOptionEqualToValue={(val1, val2) => isOptionEqualToValue(val1, val2, field.itemValue)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              variant="standard"
+                              label={field.label}
+                              error={formik.touched[field.key] && Boolean(formik.errors[field.key])}
+                              helperText={formik.touched[field.key] && formik.errors[field.key]}
+                            />
+                          )}
+                          onOpen={() => setDialogs(prevState => {
+                            const updatedDialogs = [...prevState];
+                            updatedDialogs[field.key] = true;
+                            return updatedDialogs;
+                          })}
+
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => {
+                              const labelObj = field.items.find(({ _id }) => _id === option)
+                              const label = formik.values[field.unitTypeKey] === 'mm' ? labelObj.metricDisplayText : labelObj.imperialDisplayText
+                              return <Chip
+                                key={index}
+                                variant="outlined"
+                                clickable
+                                label={label}
+                                {...getTagProps({ index })}
+                              />
+                            }
+                            )}
+                          onBlur={formik.handleBlur}
+
+                        />
+
+                        <Dialog open={!!dialogs[field.key]} >
+                          <PipeSizesDialog
+                            unitType={formik.values[field.unitTypeKey]}
+                            items={field.items}
+                            handleClose={() => handleDialogClose(field.key)}
+                            selected={getSelectedPipes(formik.values[field.key])}
+                            handleSubmit={(data) => handlePipeSizeSubmit(field.key, data)}
+                          />
+                        </Dialog>
+                      </>
+                    ) : <></>
+                  }
+                </Grid>
+              ))}
+          </Grid>
         </CardContent>
         <CardActions sx={{ justifyContent: 'space-around' }}>
           <Button variant="outlined" onClick={handleCancel}>
@@ -449,9 +513,9 @@ const CustomForm = ({ formConfig, formData, handleCancelClicked, handleSubmitCli
             Submit
           </Button>
         </CardActions>
-      </form>
+      </Card >
+    </form >
 
-    </Card >
   );
 };
 

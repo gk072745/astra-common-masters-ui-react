@@ -10,9 +10,8 @@ const MainRoutes = () => {
 
             {
                 routes.map(({ path, isPrivate, Component }, index) => (
-
                     <Route key={index} path={path} element={
-                        isPrivate ? <Component /> : <PrivateRoute><Component /> </PrivateRoute>}
+                        isPrivate ? <PrivateRoute> <Component /> </PrivateRoute> : <Component />}
                     />
                 ))
             }

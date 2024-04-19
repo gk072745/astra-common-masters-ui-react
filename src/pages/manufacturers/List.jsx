@@ -166,13 +166,13 @@ const List = () => {
     }
 
     const handleSubmitClicked = async (data) => {
-        console.log(data)
+        // console.log(data)
         const modifedFormData = {
             ...data,
             compositeCode: `${data.manufacturerCode}_${data.country.country_code}`,
             country: data.country._id,
         }
-        return
+        // return
         if (!data._id) {
             await dispatch(addManufacturersData(modifedFormData))
         } else {
@@ -208,12 +208,15 @@ const List = () => {
         <div className="table-header">
             Manufacturers List
             <Dialog open={showForm} >
-                {showForm && <CustomForm
-                    formData={formData}
-                    formConfig={formConfig}
-                    handleSubmitClicked={handleSubmitClicked}
-                    handleCancelClicked={closeForm}
-                />}
+                {
+                    showForm &&
+                    <CustomForm
+                        formData={formData}
+                        formConfig={formConfig}
+                        handleSubmitClicked={handleSubmitClicked}
+                        handleCancelClicked={closeForm}
+                    />
+                }
             </Dialog>
         </div>
         <div>

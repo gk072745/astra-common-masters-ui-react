@@ -20,6 +20,9 @@ import { reducer as plumbingFixtureParametersReducer } from './plumbingFixturePa
 import { reducer as valveParametersReducer } from './valveParameters';
 import { reducer as mechEquParamsReducer } from './mechanicalEquipmentParameters';
 import { reducer as manufacturersReducer } from './manufacturersList';
+import { reducer as productRangesReducer } from './productRanges';
+import { reducer as multiPacksReducer } from './multiPacks';
+import { reducer as pipeDataReducer } from './pipeData';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -28,7 +31,7 @@ const rootReducer = combineReducers({
     MasterPipesReducer, materialTypesReducer, connectionTypesReducer, genericPipeSystemsReducer,
     pipeNetworkTypesReducer, commonProductFieldsReducer, pipeParametersReducer, normalPipeFittingParametersReducer,
     specialPipeFittingParametersReducer, dwvPipeFittingParametersReducer, pipeFittingTypesReducer,
-    plumbingFixtureParametersReducer, valveParametersReducer, mechEquParamsReducer, manufacturersReducer,
+    plumbingFixtureParametersReducer, valveParametersReducer, mechEquParamsReducer, manufacturersReducer, productRangesReducer, multiPacksReducer, pipeDataReducer
 });
 
 export const store = legacy_createStore(

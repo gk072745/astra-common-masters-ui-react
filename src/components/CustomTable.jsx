@@ -26,7 +26,7 @@ const queryReducer = (state, { type, payload }) => {
     }
 };
 
-const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fetchData, addDataText, deleteAllCicked, deleteRowClicked, openForm, importBtnClicked, handleExportOptionClicked }) => {
+const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fetchData, addDataText, deleteAllCicked, deleteRowClicked, openForm, importBtnClicked, handleExportOptionClicked, multipackBtn }) => {
     const [queries, dispatchQueries] = useReducer(queryReducer, initialQueries);
     const [anchorEl, setAnchorEl] = useState(null);
     const [rowSelectionModel, setRowSelectionModel] = useState([]);
@@ -50,10 +50,11 @@ const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fe
     const actionColumn = {
         field: 'actions',
         headerName: 'Actions',
-        flex: 1,
         editable: false,
         headerAlign: 'center',
         align: 'center',
+        width: 100,
+        sortable: false,
         renderCell: ({ row, rowIndex }) => {
             const [anchorElActions, setAnchorElActions] = useState(null);
 
@@ -199,7 +200,13 @@ const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fe
                                 />
                             </div>
                         </div>
-                        <Stack justifyContent={'flex-end'} direction={'row'} spacing={2} flexWrap={'wrap'} className="buttons-wrapper full" >
+                        <Stack
+                            useFlexGap
+                            spacing={2}
+                            flexWrap={'wrap'}
+                            direction={'row'}
+                            justifyContent={'flex-end'}
+                            className="buttons-wrapper full" >
                             <Button
                                 variant="contained"
                                 disabled={rowSelectionModel.length === 0}
@@ -240,6 +247,9 @@ const CustomTable = ({ columns = [], rows = [], rowCount = 0, tableName = '', fe
 
                             </Menu>
 
+                            {
+                                multipackBtn !== undefined && multipackBtn
+                            }
 
                             <Button variant="contained" onClick={() => openForm()} startIcon={<MdAdd />}>
                                 {addDataText}

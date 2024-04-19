@@ -22,4 +22,7 @@ export const routes = {
   ValveParameters: `ValveParameters/${apiVersion}/`,
   MechanicalEquipmentParameters: `MechanicalEquipmentParameters/${apiVersion}/`,
   Manufacturers: `Manufacturers/${apiVersion}/`,
+  ProductRanges: `ProductRanges/${apiVersion}/`,
+  MultiPacks: `MultiPacks/${apiVersion}/`,
+  PipeData: `PipeData/${apiVersion}/`,
 }

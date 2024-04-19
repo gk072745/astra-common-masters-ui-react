@@ -650,3 +650,110 @@ export const deleteMultiManufacturers = async data => {
 
   return postAPIResponse(urlWithQuery, data)
 }
+
+
+
+export const getProductRanges = async data => {
+
+  const urlWithQuery = routes.ProductRanges + (data.id ? data.id + '/' : '') + encodedURL(data);
+
+  return getAPIResponse(urlWithQuery)
+}
+
+export const addProductRanges = async data => {
+
+  return postAPIResponse(routes.ProductRanges, data)
+}
+
+export const updateProductRanges = async data => {
+  const { _id } = data
+  const requestRoute = routes.ProductRanges + _id
+
+  return putAPIResponse(requestRoute, data)
+}
+
+export const deleteProductRanges = async ({ _id }) => {
+
+  const urlWithQuery = routes.ProductRanges + _id
+
+  return deleteAPIResponse(urlWithQuery)
+}
+
+export const deleteMultiProductRanges = async data => {
+
+  const urlWithQuery = routes.ProductRanges + 'delete/multiple'
+
+  return postAPIResponse(urlWithQuery, data)
+}
+
+
+export const getMultiPacks = async data => {
+
+  const urlWithQuery = routes.MultiPacks + encodedURL(data)
+
+  return getAPIResponse(urlWithQuery)
+}
+
+export const addMultiPacks = async data => {
+
+  return postAPIResponse(routes.MultiPacks, data)
+}
+
+export const updateMultiPacks = async data => {
+  const { _id } = data
+  const requestRoute = routes.MultiPacks + _id
+
+  return putAPIResponse(requestRoute, data)
+}
+
+export const deleteMultiPacks = async ({ _id }) => {
+
+  const urlWithQuery = routes.MultiPacks + _id
+
+  return deleteAPIResponse(urlWithQuery)
+}
+
+export const deleteMultiMultiPacks = async data => {
+
+  const urlWithQuery = routes.MultiPacks + 'delete/multiple'
+
+  return postAPIResponse(urlWithQuery, data)
+}
+
+
+
+
+
+
+export const getPipeData = async data => {
+
+  const urlWithQuery = routes.PipeData + encodedURL(data)
+
+  return getAPIResponse(urlWithQuery)
+}
+
+export const addPipeData = async data => {
+
+  return postAPIResponse(routes.PipeData, data)
+}
+
+export const updatePipeData = async data => {
+  const { _id } = data
+  const requestRoute = routes.PipeData + _id
+
+  return putAPIResponse(requestRoute, data)
+}
+
+export const deletePipeData = async ({ _id }) => {
+
+  const urlWithQuery = routes.PipeData + _id
+
+  return deleteAPIResponse(urlWithQuery)
+}
+
+export const deleteMultiPipeData = async data => {
+
+  const urlWithQuery = routes.PipeData + 'delete/multiple'
+
+  return postAPIResponse(urlWithQuery, data)
+}

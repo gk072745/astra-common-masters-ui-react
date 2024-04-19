@@ -7,7 +7,7 @@ export default {
       title: 'Products',
       children: [
         { title: 'Range', to: 'manufacturers-product-ranges' },
-        { title: 'Pipe', to: { name: 'manufacturers-product-ranges-pipe-id', params: { id: 'all' } } },
+        { title: 'Pipe', to: 'manufacturers-product-ranges/pipe/all' },
         { title: 'Normal Pipe Fittings ', to: { name: 'manufacturers-product-ranges-normal-pipe-fittings-id', params: { id: 'all' } } },
         { title: 'Special Pipe Fittings ', to: { name: 'manufacturers-product-ranges-special-pipe-fititngs-id', params: { id: 'all' } } },
         { title: 'DWV Pipe Fittings ', to: { name: 'manufacturers-product-ranges-dwv-pipe-fittings-id', params: { id: 'all' } } },

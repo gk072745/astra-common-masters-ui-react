@@ -1,6 +1,8 @@
 import ImportLogs from "../pages/ImportLogs";
 import Login from "../pages/Login";
 import List from "../pages/manufacturers/List";
+import Pipe from "../pages/manufacturers/products/Pipe";
+import Ranges from "../pages/manufacturers/products/Ranges";
 import CommonProductFields from "../pages/projectDetails/CommonProductFields";
 import ConnectionTypes from "../pages/projectDetails/ConnectionTypes";
 import Country from "../pages/projectDetails/Country";
@@ -114,5 +116,15 @@ export const routes = [
         path: '/manufacturers-list',
         isPrivate: true,
         Component: List
+    },
+    {
+        path: '/manufacturers-product-ranges',
+        isPrivate: true,
+        Component: Ranges
+    },
+    {
+        path: '/manufacturers-product-ranges/pipe/:id',
+        isPrivate: true,
+        Component: Pipe,
     },
 ]
